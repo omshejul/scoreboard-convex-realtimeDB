@@ -1,103 +1,229 @@
-import Image from "next/image";
+"use client";
+
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { Authenticated, Unauthenticated } from "convex/react";
+import { SignIn } from "./SignIn";
+
+const SLUG = "main";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <Unauthenticated>
+        <SignIn />
+      </Unauthenticated>
+      <Authenticated>
+        <Scoreboard />
+      </Authenticated>
+    </>
+  );
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+function Scoreboard() {
+  const scoreboard = useQuery(api.scoreboard.get, { slug: SLUG });
+  const increment = useMutation(api.scoreboard.increment);
+  const decrement = useMutation(api.scoreboard.decrement);
+  const reset = useMutation(api.scoreboard.reset);
+
+  // Optimistic state for instant UI updates
+  const [optimisticLeft, setOptimisticLeft] = useState<number | null>(null);
+  const [optimisticRight, setOptimisticRight] = useState<number | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  console.log("[SCOREBOARD]", scoreboard);
+
+  // Reset optimistic state when server data changes
+  useEffect(() => {
+    if (scoreboard !== undefined) {
+      setOptimisticLeft(null);
+      setOptimisticRight(null);
+    }
+  }, [scoreboard?.left, scoreboard?.right]);
+
+  //Loading state while the query connects
+  if (scoreboard === undefined) {
+    return (
+      <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+        <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+          <div className="flex items-center justify-center h-screen">
+            <span className="text-lg">Connecting…</span>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Use optimistic values if available, otherwise use server values
+  const left = optimisticLeft ?? scoreboard.left ?? 0;
+  const right = optimisticRight ?? scoreboard.right ?? 0;
+
+  const handleIncrement = async (side: "left" | "right") => {
+    // Optimistically update the UI immediately
+    if (side === "left") {
+      setOptimisticLeft((scoreboard.left ?? 0) + 1);
+    } else {
+      setOptimisticRight((scoreboard.right ?? 0) + 1);
+    }
+
+    // Then send the mutation to the server
+    increment({ slug: SLUG, side });
+  };
+
+  const handleDecrement = async (side: "left" | "right") => {
+    // Prevent going below 0
+    const currentValue = side === "left" ? left : right;
+    if (currentValue <= 0) return;
+
+    // Optimistically update the UI immediately
+    if (side === "left") {
+      setOptimisticLeft(Math.max(0, (scoreboard.left ?? 0) - 1));
+    } else {
+      setOptimisticRight(Math.max(0, (scoreboard.right ?? 0) - 1));
+    }
+
+    // Then send the mutation to the server
+    decrement({ slug: SLUG, side });
+  };
+
+  const handleReset = async () => {
+    // Optimistically reset the UI immediately
+    setOptimisticLeft(0);
+    setOptimisticRight(0);
+
+    // Then send the mutation to the server
+    reset({ slug: SLUG });
+    setShowResetConfirm(false);
+  };
+
+  return (
+    <div className="grid grid-rows-[1fr_auto] grid-cols-2 h-screen w-screen">
+      <div className="relative border-r-2 border-black">
+        <button
+          onClick={() => handleIncrement("left")}
+          className="bg-red-500 w-full h-full flex flex-col items-center justify-center gap-3"
+        >
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={left}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-7xl font-extrabold tracking-tight"
+            >
+              {left}
+            </motion.span>
+          </AnimatePresence>
+          <span className="text-sm tracking-widest">LEFT</span>
+        </button>
+        
+        {left > 0 && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDecrement("left");
+            }}
+            whileTap={{ scale: 0.9 }}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            −
+          </motion.button>
+        )}
+      </div>
+
+      <div className="relative">
+        <button
+          onClick={() => handleIncrement("right")}
+          className="bg-blue-500 w-full h-full flex flex-col items-center justify-center gap-3"
+        >
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={right}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-7xl font-extrabold tracking-tight"
+            >
+              {right}
+            </motion.span>
+          </AnimatePresence>
+          <span className="text-sm tracking-widest">RIGHT</span>
+        </button>
+        
+        {right > 0 && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDecrement("right");
+            }}
+            whileTap={{ scale: 0.9 }}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            −
+          </motion.button>
+        )}
+      </div>
+
+      <motion.button
+        onClick={() => setShowResetConfirm(true)}
+        whileTap={{ scale: 0.95 }}
+        className="col-span-full py-3 text-base"
+      >
+        Reset
+      </motion.button>
+
+      {/* Reset Confirmation Dialog */}
+      <AnimatePresence>
+        {showResetConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-xl shadow-lg border max-w-md w-full p-6"
+            >
+              <div className="flex flex-col space-y-2 text-center sm:text-left">
+                <h2 className="text-lg text-black font-semibold">Reset scoreboard?</h2>
+                <p className="text-sm text-slate-600">
+                  This will reset both scores to zero. This action cannot be undone.
+                </p>
+              </div>
+              
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6 space-y-2 space-y-reverse sm:space-y-0">
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowResetConfirm(false)}
+                  className="inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleReset}
+                  className="text-white border border-red-500 bg-red-500 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+                >
+                  Reset
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
