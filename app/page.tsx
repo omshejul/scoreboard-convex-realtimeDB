@@ -41,7 +41,7 @@ function Scoreboard() {
       setOptimisticLeft(null);
       setOptimisticRight(null);
     }
-  }, [scoreboard?.left, scoreboard?.right]);
+  }, [scoreboard]);
 
   //Loading state while the query connects
   if (scoreboard === undefined) {
