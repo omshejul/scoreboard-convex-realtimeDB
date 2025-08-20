@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { SignIn } from "./SignIn";
+import { Minus, ArrowClockwise } from "phosphor-react";
 
 const SLUG = "main";
 
@@ -24,6 +25,54 @@ export default function Home() {
 
 function Scoreboard() {
   const scoreboard = useQuery(api.scoreboard.get, { slug: SLUG });
+
+  // Fix iOS viewport glitches on orientation change
+  useEffect(() => {
+    const handleResize = () => {
+      // Force viewport height recalculation
+      document.documentElement.style.setProperty(
+        "--vh",
+        `${window.innerHeight * 0.01}px`
+      );
+    };
+
+    const handleOrientationChange = () => {
+      // Delay to allow iOS to finish transition
+      setTimeout(() => {
+        handleResize();
+        // Force a repaint
+        document.body.style.height = "100dvh";
+      }, 100);
+    };
+
+    // Set initial viewport height
+    handleResize();
+
+    // Listen for resize and orientation changes
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleOrientationChange);
+
+    // iOS-specific viewport fix
+    if (
+      typeof window !== "undefined" &&
+      /iPad|iPhone|iPod/.test(navigator.userAgent)
+    ) {
+      window.addEventListener("load", handleResize);
+      document.addEventListener("touchstart", handleResize, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleOrientationChange);
+      if (
+        typeof window !== "undefined" &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent)
+      ) {
+        window.removeEventListener("load", handleResize);
+        document.removeEventListener("touchstart", handleResize);
+      }
+    };
+  }, []);
   const increment = useMutation(api.scoreboard.increment);
   const decrement = useMutation(api.scoreboard.decrement);
   const reset = useMutation(api.scoreboard.reset);
@@ -99,8 +148,8 @@ function Scoreboard() {
   };
 
   return (
-    <div className="grid grid-rows-[1fr_auto] grid-cols-2 h-screen w-screen">
-      <div className="relative border-r-2 border-black">
+    <div className="grid grid-cols-2 h-full w-full overflow-hidden">
+      <div className="relative border-r border-black/20">
         <button
           onClick={() => handleIncrement("left")}
           className="bg-red-500 w-full h-full flex flex-col items-center justify-center gap-3"
@@ -118,7 +167,7 @@ function Scoreboard() {
           </AnimatePresence>
           <span className="text-sm tracking-widest">LEFT</span>
         </button>
-        
+
         {left > 0 && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
@@ -129,11 +178,20 @@ function Scoreboard() {
               handleDecrement("left");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-4 right-4 standalone:top-16 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            −
+            <Minus size={16} weight="bold" />
           </motion.button>
         )}
+
+        {/* Reset button - bottom left */}
+        <motion.button
+          onClick={() => setShowResetConfirm(true)}
+          whileTap={{ scale: 0.9 }}
+          className="absolute bottom-4 left-4 w-12 h-12 rounded-full bg-black/50 border border-neutral-500/30 text-white text-xs font-bold flex items-center justify-center shadow-lg"
+        >
+          <ArrowClockwise size={20} weight="bold" />
+        </motion.button>
       </div>
 
       <div className="relative">
@@ -154,7 +212,7 @@ function Scoreboard() {
           </AnimatePresence>
           <span className="text-sm tracking-widest">RIGHT</span>
         </button>
-        
+
         {right > 0 && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
@@ -165,20 +223,12 @@ function Scoreboard() {
               handleDecrement("right");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-4 right-4 standalone:top-16 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            −
+            <Minus size={16} weight="bold" />
           </motion.button>
         )}
       </div>
-
-      <motion.button
-        onClick={() => setShowResetConfirm(true)}
-        whileTap={{ scale: 0.95 }}
-        className="col-span-full py-3 text-base"
-      >
-        Reset
-      </motion.button>
 
       {/* Reset Confirmation Dialog */}
       <AnimatePresence>
@@ -198,12 +248,15 @@ function Scoreboard() {
               className="bg-white rounded-xl shadow-lg border max-w-md w-full p-6"
             >
               <div className="flex flex-col space-y-2 text-center sm:text-left">
-                <h2 className="text-lg text-black font-semibold">Reset scoreboard?</h2>
+                <h2 className="text-lg text-black font-semibold">
+                  Reset scoreboard?
+                </h2>
                 <p className="text-sm text-slate-600">
-                  This will reset both scores to zero. This action cannot be undone.
+                  This will reset both scores to zero. This action cannot be
+                  undone.
                 </p>
               </div>
-              
+
               <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6 space-y-2 space-y-reverse sm:space-y-0">
                 <motion.button
                   whileTap={{ scale: 0.98 }}
