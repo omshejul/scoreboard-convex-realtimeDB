@@ -63,13 +63,13 @@ export function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg/5 border border-neutral-400/30 overflow-hidden">
           <div className="px-8 py-10">
             <motion.div
               initial={{ opacity: 0 }}
@@ -77,10 +77,10 @@ export function SignIn() {
               transition={{ delay: 0.1 }}
               className="text-center mb-8"
             >
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
                 Welcome to Scoreboard
               </h1>
-              <p className="text-slate-600">
+              <p className="text-neutral-600 dark:text-neutral-400">
                 {step === "signIn" ? "Enter your email to get started" : "Check your email for the code"}
               </p>
             </motion.div>
@@ -129,7 +129,7 @@ function EmailForm({
       className="space-y-6"
     >
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+        <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
           Email address
         </label>
         <input
@@ -138,7 +138,7 @@ function EmailForm({
           type="email"
           required
           disabled={isLoading}
-          className="w-full px-4 text-black py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           placeholder="Enter your email"
         />
       </div>
@@ -147,7 +147,7 @@ function EmailForm({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+          className="p-3 bg-red-50 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"
         >
           {error}
         </motion.div>
@@ -213,15 +213,15 @@ function CodeForm({
       className="space-y-6"
     >
       <div className="text-center">
-        <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-neutral-600  dark:text-neutral-400 mb-6">
           We sent a verification code to{" "}
-          <span className="font-medium text-slate-900">{email}</span>
+          <span className="font-medium text-neutral-900  dark:text-neutral-100">{email}</span>
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label htmlFor="code" className="block text-lg font-bold text-center text-slate-700 mb-3">
+          <label htmlFor="code" className="block text-lg font-bold text-center text-neutral-700 dark:text-neutral-300 mb-3">
             Verification code
           </label>
           <OTPInput disabled={isLoading} />
@@ -266,7 +266,7 @@ function CodeForm({
               onClick={handleResendCode}
               disabled={isLoading || isResending}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-700 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isResending ? "Sending..." : "Resend code"}
             </motion.button>
@@ -276,7 +276,7 @@ function CodeForm({
               onClick={onBack}
               disabled={isLoading}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-700 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
             >
               Back to email
             </motion.button>
@@ -341,12 +341,12 @@ function OTPInput({ disabled }: { disabled: boolean }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="w-10 h-10 text-black text-center text-base font-mono font-bold border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-10 h-10 text-black dark:text-neutral-100 text-center text-base font-mono font-bold border-2 border-neutral-300 dark:border-neutral-700 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           />
         ))}
       </div>
       <input name="code" type="hidden" />
-      <p className="text-xs text-slate-500 text-center">
+      <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
         Enter the 4-digit code from your email
       </p>
     </div>
