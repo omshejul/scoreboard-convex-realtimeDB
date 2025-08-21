@@ -8,8 +8,6 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise } from "phosphor-react";
 
-const SLUG = "main";
-
 export default function Home() {
   return (
     <>
@@ -24,7 +22,17 @@ export default function Home() {
 }
 
 function Scoreboard() {
-  const scoreboard = useQuery(api.scoreboard.get, { slug: SLUG });
+  const currentUser = useQuery(api.auth.currentUser);
+
+  // Generate user-specific slug using user ID - no fallback, user must be authenticated
+  const userSlug = currentUser?.tokenIdentifier
+    ? `user-${currentUser.tokenIdentifier}`
+    : null;
+
+  const scoreboard = useQuery(
+    api.scoreboard.get,
+    userSlug ? { slug: userSlug } : "skip"
+  );
 
   // Fix iOS viewport glitches on orientation change
   useEffect(() => {
@@ -110,6 +118,8 @@ function Scoreboard() {
   const right = optimisticRight ?? scoreboard.right ?? 0;
 
   const handleIncrement = async (side: "left" | "right") => {
+    if (!userSlug) return;
+
     // Optimistically update the UI immediately
     if (side === "left") {
       setOptimisticLeft((scoreboard.left ?? 0) + 1);
@@ -118,10 +128,12 @@ function Scoreboard() {
     }
 
     // Then send the mutation to the server
-    increment({ slug: SLUG, side });
+    increment({ slug: userSlug, side });
   };
 
   const handleDecrement = async (side: "left" | "right") => {
+    if (!userSlug) return;
+
     // Prevent going below 0
     const currentValue = side === "left" ? left : right;
     if (currentValue <= 0) return;
@@ -134,16 +146,18 @@ function Scoreboard() {
     }
 
     // Then send the mutation to the server
-    decrement({ slug: SLUG, side });
+    decrement({ slug: userSlug, side });
   };
 
   const handleReset = async () => {
+    if (!userSlug) return;
+
     // Optimistically reset the UI immediately
     setOptimisticLeft(0);
     setOptimisticRight(0);
 
     // Then send the mutation to the server
-    reset({ slug: SLUG });
+    reset({ slug: userSlug });
     setShowResetConfirm(false);
   };
 
