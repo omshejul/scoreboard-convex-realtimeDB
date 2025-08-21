@@ -1,24 +1,14 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.auth.getUserIdentity();
-  },
-});
-
 export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
-    const doc = await ctx.db
+  args: {
+    slug: v.string(),
+  },
+  handler: async ({ db }, { slug }) => {
+    const doc = await db
       .query("scoreboard")
-      .withIndex("by_slug", (q) => q.eq("slug", user.email ?? ""))
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
 
     return doc ?? { left: 0, right: 0 };
@@ -27,23 +17,18 @@ export const get = query({
 
 export const increment = mutation({
   args: {
+    slug: v.string(),
     side: v.union(v.literal("left"), v.literal("right")),
   },
-  handler: async (ctx, { side }) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
-    const slug = user.email ?? "";
-    const existing = await ctx.db
+  handler: async ({ db }, { slug, side }) => {
+    const existing = await db
       .query("scoreboard")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (!existing) {
       const left = side === "left" ? 1 : 0;
       const right = side === "right" ? 1 : 0;
-      await ctx.db.insert("scoreboard", {
+      await db.insert("scoreboard", {
         slug,
         left,
         right,
@@ -57,22 +42,17 @@ export const increment = mutation({
       right: existing.right + (side === "right" ? 1 : 0),
       updatedAt: Date.now(),
     };
-    await ctx.db.patch(existing._id, next);
+    await db.patch(existing._id, next);
   },
 });
 
 export const decrement = mutation({
   args: {
+    slug: v.string(),
     side: v.union(v.literal("left"), v.literal("right")),
   },
-  handler: async (ctx, { side }) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
-    const slug = user.email ?? "";
-    const existing = await ctx.db
+  handler: async ({ db }, { slug, side }) => {
+    const existing = await db
       .query("scoreboard")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
@@ -84,25 +64,21 @@ export const decrement = mutation({
       right: Math.max(0, existing.right - (side === "right" ? 1 : 0)),
       updatedAt: Date.now(),
     };
-    await ctx.db.patch(existing._id, next);
+    await db.patch(existing._id, next);
   },
 });
 
 export const reset = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
-
-    const slug = user.email ?? "";
-    const existing = await ctx.db
+  args: {
+    slug: v.string(),
+  },
+  handler: async ({ db }, { slug }) => {
+    const existing = await db
       .query("scoreboard")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
     if (existing) {
-      await ctx.db.patch(existing._id, {
+      await db.patch(existing._id, {
         left: 0,
         right: 0,
         updatedAt: Date.now(),
