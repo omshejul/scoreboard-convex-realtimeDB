@@ -8,8 +8,6 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise } from "phosphor-react";
 
-const SLUG = "main";
-
 export default function Home() {
   return (
     <>
@@ -24,7 +22,7 @@ export default function Home() {
 }
 
 function Scoreboard() {
-  const scoreboard = useQuery(api.scoreboard.get, { slug: SLUG });
+  const scoreboard = useQuery(api.scoreboard.get);
 
   // Fix iOS viewport glitches on orientation change
   useEffect(() => {
@@ -118,7 +116,7 @@ function Scoreboard() {
     }
 
     // Then send the mutation to the server
-    increment({ slug: SLUG, side });
+    increment({ side });
   };
 
   const handleDecrement = async (side: "left" | "right") => {
@@ -134,7 +132,7 @@ function Scoreboard() {
     }
 
     // Then send the mutation to the server
-    decrement({ slug: SLUG, side });
+    decrement({ side });
   };
 
   const handleReset = async () => {
@@ -143,7 +141,7 @@ function Scoreboard() {
     setOptimisticRight(0);
 
     // Then send the mutation to the server
-    reset({ slug: SLUG });
+    reset();
     setShowResetConfirm(false);
   };
 
