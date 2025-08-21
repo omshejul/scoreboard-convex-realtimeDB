@@ -87,6 +87,7 @@ function Scoreboard() {
   const [optimisticLeft, setOptimisticLeft] = useState<number | null>(null);
   const [optimisticRight, setOptimisticRight] = useState<number | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   console.log("[SCOREBOARD]", scoreboard);
 
@@ -116,47 +117,81 @@ function Scoreboard() {
   const right = optimisticRight ?? scoreboard.right ?? 0;
 
   const handleIncrement = async (side: "left" | "right") => {
-    if (!userSlug) return;
+    if (!userSlug || isUpdating) return;
+
+    setIsUpdating(true);
 
     // Optimistically update the UI immediately
     if (side === "left") {
-      setOptimisticLeft((scoreboard.left ?? 0) + 1);
+      setOptimisticLeft((scoreboard?.left ?? 0) + 1);
     } else {
-      setOptimisticRight((scoreboard.right ?? 0) + 1);
+      setOptimisticRight((scoreboard?.right ?? 0) + 1);
     }
 
-    // Then send the mutation to the server
-    increment({ slug: userSlug, side });
+    try {
+      // Then send the mutation to the server
+      await increment({ slug: userSlug, side });
+    } catch (error) {
+      console.error("Failed to increment:", error);
+      // Reset optimistic state on error
+      setOptimisticLeft(null);
+      setOptimisticRight(null);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDecrement = async (side: "left" | "right") => {
-    if (!userSlug) return;
+    if (!userSlug || isUpdating) return;
 
     // Prevent going below 0
     const currentValue = side === "left" ? left : right;
     if (currentValue <= 0) return;
 
+    setIsUpdating(true);
+
     // Optimistically update the UI immediately
     if (side === "left") {
-      setOptimisticLeft(Math.max(0, (scoreboard.left ?? 0) - 1));
+      setOptimisticLeft(Math.max(0, (scoreboard?.left ?? 0) - 1));
     } else {
-      setOptimisticRight(Math.max(0, (scoreboard.right ?? 0) - 1));
+      setOptimisticRight(Math.max(0, (scoreboard?.right ?? 0) - 1));
     }
 
-    // Then send the mutation to the server
-    decrement({ slug: userSlug, side });
+    try {
+      // Then send the mutation to the server
+      await decrement({ slug: userSlug, side });
+    } catch (error) {
+      console.error("Failed to decrement:", error);
+      // Reset optimistic state on error
+      setOptimisticLeft(null);
+      setOptimisticRight(null);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleReset = async () => {
-    if (!userSlug) return;
+    if (!userSlug || isUpdating) return;
+
+    setIsUpdating(true);
 
     // Optimistically reset the UI immediately
     setOptimisticLeft(0);
     setOptimisticRight(0);
 
-    // Then send the mutation to the server
-    reset({ slug: userSlug });
-    setShowResetConfirm(false);
+    try {
+      // Then send the mutation to the server
+      await reset({ slug: userSlug });
+      setShowResetConfirm(false);
+    } catch (error) {
+      console.error("Failed to reset:", error);
+      // Reset optimistic state on error
+      setOptimisticLeft(null);
+      setOptimisticRight(null);
+    } finally {
+      setIsUpdating(false);
+      setShowResetConfirm(false);
+    }
   };
 
   return (
