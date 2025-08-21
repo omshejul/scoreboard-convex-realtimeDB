@@ -207,13 +207,13 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="font-bold tracking-tight"
-              style={{ fontSize: "10rem" }}
+              className="font-bold font-sans tracking-tight"
+              style={{ fontSize: "20vw" }}
             >
               {left}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm tracking-widest">LEFT</span>
+          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">LEFT</span>
         </button>
 
         {left > 0 && (
@@ -226,7 +226,7 @@ function Scoreboard() {
               handleDecrement("left");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-[8vh] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-[6vh] left-[6vh] w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
             <Minus size={32} weight="bold" />
           </motion.button>
@@ -253,13 +253,13 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="font-bold tracking-tight"
-              style={{ fontSize: "10rem" }}
+              className="font-bold font-sans tracking-tight"
+              style={{ fontSize: "20vw" }}
             >
               {right}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm tracking-widest">RIGHT</span>
+          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">RIGHT</span>
         </button>
 
         {right > 0 && (
@@ -272,7 +272,7 @@ function Scoreboard() {
               handleDecrement("right");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-[8vh] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-[6vh] left-[6vh] w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
             <Minus size={32} weight="bold" />
           </motion.button>

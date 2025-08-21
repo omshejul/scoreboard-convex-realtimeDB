@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ConvexClientProvider } from "./ConvexClientProvider";
@@ -11,6 +11,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const mainFont = Press_Start_2P({
+  weight: "400",
+  variable: "--font-mainFont",
   subsets: ["latin"],
 });
 
@@ -76,7 +82,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased h-[100dvh] w-screen overflow-hidden`}
+          className={`${geistSans.variable} ${geistMono.variable} ${mainFont.variable} antialiased h-[100dvh] w-screen overflow-hidden`}
         >
           <ConvexClientProvider>
             <div className="h-full w-full overflow-hidden">{children}</div>
