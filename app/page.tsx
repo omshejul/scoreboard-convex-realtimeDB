@@ -160,7 +160,8 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-7xl font-extrabold tracking-tight"
+              className="font-bold tracking-tight"
+              style={{ fontSize: "10rem" }}
             >
               {left}
             </motion.span>
@@ -178,9 +179,9 @@ function Scoreboard() {
               handleDecrement("left");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-4 right-4 standalone:top-16 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-[8vh] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            <Minus size={16} weight="bold" />
+            <Minus size={32} weight="bold" />
           </motion.button>
         )}
 
@@ -205,7 +206,8 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-7xl font-extrabold tracking-tight"
+              className="font-bold tracking-tight"
+              style={{ fontSize: "10rem" }}
             >
               {right}
             </motion.span>
@@ -223,9 +225,9 @@ function Scoreboard() {
               handleDecrement("right");
             }}
             whileTap={{ scale: 0.9 }}
-            className="absolute top-4 right-4 standalone:top-16 w-10 h-10 rounded-full bg-black/50 border border-neutral-500/30 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            className="absolute top-[8vh] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
           >
-            <Minus size={16} weight="bold" />
+            <Minus size={32} weight="bold" />
           </motion.button>
         )}
       </div>
