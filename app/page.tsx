@@ -24,10 +24,8 @@ export default function Home() {
 function Scoreboard() {
   const currentUser = useQuery(api.auth.currentUser);
 
-  // Generate user-specific slug using user ID - no fallback, user must be authenticated
-  const userSlug = currentUser?.tokenIdentifier
-    ? `user-${currentUser.tokenIdentifier}`
-    : null;
+  // Generate user-specific slug using user subject (shorter and cleaner)
+  const userSlug = currentUser?.subject ? `user-${currentUser.subject}` : null;
 
   const scoreboard = useQuery(
     api.scoreboard.get,
