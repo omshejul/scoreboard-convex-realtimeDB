@@ -124,6 +124,11 @@ export default function SnapDrag({
 
       controls.start({ x, y, transition: { duration: instant ? 0 : 0.2 } });
       setCurrentCorner(cornerToUse);
+      if (typeof window !== "undefined" && storageKey) {
+        try {
+          window.localStorage.setItem(storageKey, cornerToUse);
+        } catch {}
+      }
     },
     [allowedCorners, controls, getSnapBounds, computeXYForCorner, parentRef]
   );
@@ -185,6 +190,11 @@ export default function SnapDrag({
           .start({ x: targetX, y: targetY, transition: { duration: 0 } })
           .then(() => setCurrentCorner(cornerToUse));
       }
+      if (typeof window !== "undefined" && storageKey) {
+        try {
+          window.localStorage.setItem(storageKey, cornerToUse);
+        } catch {}
+      }
     };
 
     const id = requestAnimationFrame(setInitial);
@@ -202,9 +212,9 @@ export default function SnapDrag({
 
   // Re-snap on orientation or parent/element resize so it stays aligned
   useEffect(() => {
+    if (!currentCorner) return;
     const handler = () => {
-      const fallback = currentCorner ?? initialCorner;
-      resnapToCorner(fallback, true);
+      resnapToCorner(currentCorner, true);
     };
 
     window.addEventListener("resize", handler);
@@ -226,14 +236,7 @@ export default function SnapDrag({
       window.removeEventListener("orientationchange", handler);
       if (ro) ro.disconnect();
     };
-  }, [
-    parentRef,
-    currentCorner,
-    initialCorner,
-    inset,
-    allowedCorners,
-    resnapToCorner,
-  ]);
+  }, [parentRef, currentCorner, resnapToCorner]);
 
   const onDragEnd = () => {
     const parent = parentRef.current;
