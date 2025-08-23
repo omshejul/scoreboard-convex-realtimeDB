@@ -1,6 +1,13 @@
 "use client";
 
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { motion, useAnimation } from "motion/react";
 
 type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
@@ -49,63 +56,77 @@ export default function SnapDrag({
   const controls = useAnimation();
   const [currentCorner, setCurrentCorner] = useState<Corner | null>(null);
 
-  const getSnapBounds = (parent: DOMRect, el: DOMRect, elNode: HTMLElement) => {
-    const styles = window.getComputedStyle(elNode);
-    const marginLeft = parseFloat(styles.marginLeft || "0") || 0;
-    const marginRight = parseFloat(styles.marginRight || "0") || 0;
-    const marginTop = parseFloat(styles.marginTop || "0") || 0;
-    const marginBottom = parseFloat(styles.marginBottom || "0") || 0;
+  const getSnapBounds = useCallback(
+    (parent: DOMRect, el: DOMRect, elNode: HTMLElement) => {
+      const styles = window.getComputedStyle(elNode);
+      const marginLeft = parseFloat(styles.marginLeft || "0") || 0;
+      const marginRight = parseFloat(styles.marginRight || "0") || 0;
+      const marginTop = parseFloat(styles.marginTop || "0") || 0;
+      const marginBottom = parseFloat(styles.marginBottom || "0") || 0;
 
-    const minX = inset + marginLeft;
-    const maxX = Math.max(minX, parent.width - el.width - inset - marginRight);
-    const minY = inset + marginTop;
-    const maxY = Math.max(
-      minY,
-      parent.height - el.height - inset - marginBottom
-    );
+      const minX = inset + marginLeft;
+      const maxX = Math.max(
+        minX,
+        parent.width - el.width - inset - marginRight
+      );
+      const minY = inset + marginTop;
+      const maxY = Math.max(
+        minY,
+        parent.height - el.height - inset - marginBottom
+      );
 
-    return { minX, maxX, minY, maxY };
-  };
+      return { minX, maxX, minY, maxY };
+    },
+    [inset]
+  );
 
-  const computeXYForCorner = (
-    corner: Corner,
-    bounds: { minX: number; maxX: number; minY: number; maxY: number }
-  ) => {
-    const { minX, maxX, minY, maxY } = bounds;
-    switch (corner) {
-      case "top-right":
-        return { x: maxX, y: minY };
-      case "bottom-left":
-        return { x: minX, y: maxY };
-      case "bottom-right":
-        return { x: maxX, y: maxY };
-      case "top-left":
-      default:
-        return { x: minX, y: minY };
-    }
-  };
+  const computeXYForCorner = useCallback(
+    (
+      corner: Corner,
+      bounds: { minX: number; maxX: number; minY: number; maxY: number }
+    ) => {
+      const { minX, maxX, minY, maxY } = bounds;
+      switch (corner) {
+        case "top-right":
+          return { x: maxX, y: minY };
+        case "bottom-left":
+          return { x: minX, y: maxY };
+        case "bottom-right":
+          return { x: maxX, y: maxY };
+        case "top-left":
+        default:
+          return { x: minX, y: minY };
+      }
+    },
+    []
+  );
 
-  const resnapToCorner = (corner: Corner, instant = true) => {
-    const parent = parentRef.current;
-    const el = boxRef.current;
-    if (!parent || !el) return;
+  const resnapToCorner = useCallback(
+    (corner: Corner, instant = true) => {
+      const parent = parentRef.current;
+      const el = boxRef.current;
+      if (!parent || !el) return;
 
-    const p = parent.getBoundingClientRect();
-    const e = el.getBoundingClientRect();
-    const bounds = getSnapBounds(p, e, el);
+      const p = parent.getBoundingClientRect();
+      const e = el.getBoundingClientRect();
+      const bounds = getSnapBounds(p, e, el);
 
-    const allowed: ReadonlyArray<Corner> =
-      allowedCorners && allowedCorners.length > 0
-        ? allowedCorners
-        : ALL_CORNERS;
+      const allowed: ReadonlyArray<Corner> =
+        allowedCorners && allowedCorners.length > 0
+          ? allowedCorners
+          : ALL_CORNERS;
 
-    const cornerToUse: Corner = allowed.includes(corner) ? corner : allowed[0];
+      const cornerToUse: Corner = allowed.includes(corner)
+        ? corner
+        : allowed[0];
 
-    const { x, y } = computeXYForCorner(cornerToUse, bounds);
+      const { x, y } = computeXYForCorner(cornerToUse, bounds);
 
-    controls.start({ x, y, transition: { duration: instant ? 0 : 0.2 } });
-    setCurrentCorner(cornerToUse);
-  };
+      controls.start({ x, y, transition: { duration: instant ? 0 : 0.2 } });
+      setCurrentCorner(cornerToUse);
+    },
+    [allowedCorners, controls, getSnapBounds, computeXYForCorner, parentRef]
+  );
 
   // Place the element at the initial snapped corner on mount
   useLayoutEffect(() => {
@@ -152,8 +173,10 @@ export default function SnapDrag({
       });
 
       // Set instantly to avoid animation/jump on first paint
-      const c: { set?: (v: unknown) => void; start: typeof controls.start } =
-        controls as unknown as any;
+      const c = controls as unknown as {
+        set?: (v: { x?: number; y?: number }) => void;
+        start: typeof controls.start;
+      };
       if (typeof c.set === "function") {
         c.set({ x: targetX, y: targetY });
         setCurrentCorner(cornerToUse);
@@ -166,7 +189,16 @@ export default function SnapDrag({
 
     const id = requestAnimationFrame(setInitial);
     return () => cancelAnimationFrame(id);
-  }, [parentRef, inset, initialCorner, allowedCorners, storageKey, controls]);
+  }, [
+    parentRef,
+    inset,
+    initialCorner,
+    allowedCorners,
+    storageKey,
+    controls,
+    getSnapBounds,
+    computeXYForCorner,
+  ]);
 
   // Re-snap on orientation or parent/element resize so it stays aligned
   useEffect(() => {
@@ -194,7 +226,14 @@ export default function SnapDrag({
       window.removeEventListener("orientationchange", handler);
       if (ro) ro.disconnect();
     };
-  }, [parentRef, currentCorner, initialCorner, inset, allowedCorners]);
+  }, [
+    parentRef,
+    currentCorner,
+    initialCorner,
+    inset,
+    allowedCorners,
+    resnapToCorner,
+  ]);
 
   const onDragEnd = () => {
     const parent = parentRef.current;
