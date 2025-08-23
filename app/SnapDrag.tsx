@@ -130,7 +130,14 @@ export default function SnapDrag({
         } catch {}
       }
     },
-    [allowedCorners, controls, getSnapBounds, computeXYForCorner, parentRef]
+    [
+      allowedCorners,
+      controls,
+      getSnapBounds,
+      computeXYForCorner,
+      parentRef,
+      storageKey,
+    ]
   );
 
   // Place the element at the initial snapped corner on mount
