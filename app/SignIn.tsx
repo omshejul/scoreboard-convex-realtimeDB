@@ -12,15 +12,15 @@ export function SignIn() {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const formData = new FormData(event.currentTarget);
       const email = formData.get("email") as string;
-      
+
       if (!email || !email.includes("@")) {
         throw new Error("Please enter a valid email address");
       }
-      
+
       await signIn("resend-otp", formData);
       setStep({ email });
     } catch (err) {
@@ -34,20 +34,23 @@ export function SignIn() {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const formData = new FormData(event.currentTarget);
       const code = formData.get("code") as string;
-      
+
       if (!code || code.length !== 4) {
         throw new Error("Please enter a complete 4-digit code");
       }
-      
+
       await signIn("resend-otp", formData);
     } catch (err) {
       // Handle specific Convex Auth errors
       if (err instanceof Error) {
-        if (err.message.includes("Could not verify code") || err.message.includes("verification")) {
+        if (
+          err.message.includes("Could not verify code") ||
+          err.message.includes("verification")
+        ) {
           setError("Invalid verification code. Please check and try again.");
         } else if (err.message.includes("expired")) {
           setError("Verification code has expired. Please request a new one.");
@@ -81,13 +84,15 @@ export function SignIn() {
                 Welcome to Scoreboard
               </h1>
               <p className="text-neutral-600 dark:text-neutral-400">
-                {step === "signIn" ? "Enter your email to get started" : "Check your email for the code"}
+                {step === "signIn"
+                  ? "Enter your email to get started"
+                  : "Check your email for the code"}
               </p>
             </motion.div>
 
             <AnimatePresence mode="wait">
               {step === "signIn" ? (
-                <EmailForm 
+                <EmailForm
                   key="email"
                   onSubmit={handleEmailSubmit}
                   isLoading={isLoading}
@@ -111,11 +116,11 @@ export function SignIn() {
   );
 }
 
-function EmailForm({ 
-  onSubmit, 
-  isLoading, 
-  error 
-}: { 
+function EmailForm({
+  onSubmit,
+  isLoading,
+  error,
+}: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
   error: string | null;
@@ -129,7 +134,10 @@ function EmailForm({
       className="space-y-6"
     >
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+        >
           Email address
         </label>
         <input
@@ -176,13 +184,13 @@ function EmailForm({
   );
 }
 
-function CodeForm({ 
+function CodeForm({
   email,
-  onSubmit, 
+  onSubmit,
   onBack,
-  isLoading, 
-  error 
-}: { 
+  isLoading,
+  error,
+}: {
   email: string;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onBack: () => void;
@@ -213,15 +221,20 @@ function CodeForm({
       className="space-y-6"
     >
       <div className="text-center">
-          <p className="text-sm text-neutral-600  dark:text-neutral-400 mb-6">
+        <p className="text-sm text-neutral-600  dark:text-neutral-400 mb-6">
           We sent a verification code to{" "}
-          <span className="font-medium text-neutral-900  dark:text-neutral-100">{email}</span>
+          <span className="font-medium text-neutral-900  dark:text-neutral-100">
+            {email}
+          </span>
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label htmlFor="code" className="block text-lg font-bold text-center text-neutral-700 dark:text-neutral-300 mb-3">
+          <label
+            htmlFor="code"
+            className="block text-lg font-bold text-center text-neutral-700 dark:text-neutral-300 mb-3"
+          >
             Verification code
           </label>
           <OTPInput disabled={isLoading} />
@@ -270,7 +283,7 @@ function CodeForm({
             >
               {isResending ? "Sending..." : "Resend code"}
             </motion.button>
-            
+
             <motion.button
               type="button"
               onClick={onBack}
@@ -282,14 +295,14 @@ function CodeForm({
             </motion.button>
           </div>
         </div>
-    </form>
+      </form>
     </motion.div>
   );
 }
 // MARK: OTPInput
 function OTPInput({ disabled }: { disabled: boolean }) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) {
       // Handle paste
@@ -308,17 +321,23 @@ function OTPInput({ disabled }: { disabled: boolean }) {
         inputRefs.current[index + 1]?.focus();
       }
     }
-    
+
     // Update the hidden input
-    const code = inputRefs.current.map(ref => ref?.value || "").join("");
-    const hiddenInput = document.querySelector('input[name="code"]') as HTMLInputElement;
+    const code = inputRefs.current.map((ref) => ref?.value || "").join("");
+    const hiddenInput = document.querySelector(
+      'input[name="code"]'
+    ) as HTMLInputElement;
     if (hiddenInput) {
       hiddenInput.value = code;
     }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !inputRefs.current[index]?.value && index > 0) {
+    if (
+      e.key === "Backspace" &&
+      !inputRefs.current[index]?.value &&
+      index > 0
+    ) {
       inputRefs.current[index - 1]?.focus();
     }
   };
@@ -329,15 +348,17 @@ function OTPInput({ disabled }: { disabled: boolean }) {
         {Array.from({ length: 4 }, (_, i) => (
           <motion.input
             key={i}
-            ref={el => { inputRefs.current[i] = el; }}
+            ref={(el) => {
+              inputRefs.current[i] = el;
+            }}
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
             maxLength={4} // Allow paste
             disabled={disabled}
-            onChange={e => handleChange(i, e.target.value)}
-            onKeyDown={e => handleKeyDown(i, e)}
-            onFocus={e => e.target.select()}
+            onChange={(e) => handleChange(i, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
+            onFocus={(e) => e.target.select()}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
