@@ -3,10 +3,12 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise } from "phosphor-react";
+
+import SnapDrag from "./SnapDrag";
 
 export default function Home() {
   return (
@@ -23,6 +25,8 @@ export default function Home() {
 
 function Scoreboard() {
   const currentUser = useQuery(api.auth.currentUser);
+  const parentRefLeft = useRef<HTMLDivElement>(null);
+  const parentRefRight = useRef<HTMLDivElement>(null);
 
   // Generate user-specific slug using user subject (shorter and cleaner)
   const userSlug = currentUser?.subject ? `user-${currentUser.subject}` : null;
@@ -196,7 +200,7 @@ function Scoreboard() {
 
   return (
     <div className="grid grid-cols-2 h-full w-full overflow-hidden">
-      <div className="relative border-r border-black/20">
+      <div className="relative border-r border-black/20" ref={parentRefLeft}>
         <button
           onClick={() => handleIncrement("left")}
           className="bg-red-500 w-full h-full flex flex-col items-center justify-center gap-3"
@@ -213,36 +217,48 @@ function Scoreboard() {
               {left}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">LEFT</span>
+          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">
+            LEFT
+          </span>
         </button>
 
         {left > 0 && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDecrement("left");
-            }}
-            whileTap={{ scale: 0.9 }}
-            className="absolute top-[6vh] left-[6vh] w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+          <SnapDrag
+            parentRef={parentRefLeft}
+            inset={16}
+            storageKey={
+              userSlug ? `${userSlug}-left-decrement-btn-corner` : undefined
+            }
+            allowedCorners={["top-left", "top-right", "bottom-right"]}
+            className="w-16 h-16"
           >
-            <Minus size={32} weight="bold" />
-          </motion.button>
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDecrement("left");
+              }}
+              whileTap={{ scale: 0.9 }}
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            >
+              <Minus size={32} weight="bold" />
+            </motion.button>
+          </SnapDrag>
         )}
 
         {/* Reset button - bottom left */}
         <motion.button
           onClick={() => setShowResetConfirm(true)}
           whileTap={{ scale: 0.9 }}
-          className="absolute bottom-4 left-4 w-12 h-12 rounded-full bg-black/50 border border-neutral-500/30 text-white text-xs font-bold flex items-center justify-center shadow-lg"
+          className="absolute bottom-4 left-4 w-12 h-12 rounded-full bg-black/40 border border-neutral-500/40 text-white text-xs font-bold flex items-center justify-center shadow-lg"
         >
           <ArrowClockwise size={20} weight="bold" />
         </motion.button>
       </div>
 
-      <div className="relative">
+      <div className="relative" ref={parentRefRight}>
         <button
           onClick={() => handleIncrement("right")}
           className="bg-blue-500 w-full h-full flex flex-col items-center justify-center gap-3"
@@ -259,23 +275,40 @@ function Scoreboard() {
               {right}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">RIGHT</span>
+          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">
+            RIGHT
+          </span>
         </button>
 
         {right > 0 && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDecrement("right");
-            }}
-            whileTap={{ scale: 0.9 }}
-            className="absolute top-[6vh] left-[6vh] w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+          <SnapDrag
+            parentRef={parentRefRight}
+            inset={16}
+            storageKey={
+              userSlug ? `${userSlug}-right-decrement-btn-corner` : undefined
+            }
+            allowedCorners={[
+              "top-left",
+              "top-right",
+              "bottom-right",
+              "bottom-left",
+            ]}
+            className="w-16 h-16"
           >
-            <Minus size={32} weight="bold" />
-          </motion.button>
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDecrement("right");
+              }}
+              whileTap={{ scale: 0.9 }}
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+            >
+              <Minus size={32} weight="bold" />
+            </motion.button>
+          </SnapDrag>
         )}
       </div>
 
