@@ -239,9 +239,8 @@ export const ResendOTP = Email({
     // Skip sending email for test account - just log the code
     if (email === "contact@omshejul.com") {
       console.log(
-        `Test email verification code for ${email}: ${token} (use this code to sign in)`
+        `${token} - Test email verification code for ${email} (use this code to sign in)`
       );
-      return; // Don't send actual email for test account
     }
 
     // Use fetch instead of Resend SDK to avoid React Email dependencies
