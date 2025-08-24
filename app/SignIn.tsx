@@ -1,7 +1,14 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Spinner, ArrowLeft, PaperPlaneTilt, CheckCircle, XCircle, ArrowCounterClockwise } from "phosphor-react";
+import {
+  Spinner,
+  ArrowLeft,
+  PaperPlaneTilt,
+  CheckCircle,
+  XCircle,
+  ArrowCounterClockwise,
+} from "phosphor-react";
 
 // MARK: SignIn Component
 export function SignIn() {
@@ -48,12 +55,11 @@ export function SignIn() {
       }
 
       await signIn("resend-otp", formData);
-      
+
       // Only set timeout on successful verification
       setTimeout(() => {
         setIsVerifyingCode(false);
       }, 5000);
-
     } catch (err) {
       // Handle specific Convex Auth errors
       if (err instanceof Error) {
@@ -82,6 +88,40 @@ export function SignIn() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
+        <div className="absolute -z-10 opacity-10 dark:opacity-5 rotate-45">
+          <svg
+            width="200"
+            height="200"
+            viewBox="0 0 200 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clipPath="url(#clip0_234_869)">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M50 0H0V100H50C22.3858 100 0 122.386 0 150V200H100V150C100 177.614 122.386 200 150 200H200V100H150C177.614 100 200 77.6142 200 50V0H100V50C100 22.3858 77.6142 0 50 0ZM100 100H50C77.6142 100 100 122.386 100 150V100ZM100 100V50C100 77.6142 122.386 100 150 100H100Z"
+                fill="url(#paint0_linear_234_869)"
+              />
+            </g>
+            <defs>
+              <linearGradient
+                id="paint0_linear_234_869"
+                x1="100"
+                y1="0"
+                x2="100"
+                y2="200"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#A7B5FF" />
+                <stop offset="1" stopColor="#F3ACFF" />
+              </linearGradient>
+              <clipPath id="clip0_234_869">
+                <rect width="200" height="200" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
         <div className="">
           <div className="px-8 py-10">
             <motion.div
@@ -91,17 +131,13 @@ export function SignIn() {
               className="text-center mb-8"
             >
               <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                <span className=" whitespace-nowrap">
-                  Welcome to
-                </span>{" "}
-                <span className="text-blue-500 dark:text-blue-400 font-sans text-2xl ml-2 font-bold">
+                <span className=" whitespace-nowrap">Welcome to</span>{" "}
+                <span className="bg-gradient-to-b bg-clip-text from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-700 text-transparent font-sans text-2xl ml-2 font-bold px-2 py-1 rounded-md">
                   Scoreboard
                 </span>
               </h1>
               <p className="text-neutral-600 dark:text-neutral-400">
-                {step === "signIn"
-                  ? ""
-                  : "Check your email for the code"}
+                {step === "signIn" ? "" : "Check your email for the code"}
               </p>
             </motion.div>
 
@@ -360,7 +396,13 @@ function CodeForm({
   );
 }
 // MARK: OTPInput Component
-function OTPInput({ disabled, onComplete }: { disabled: boolean, onComplete: () => void }) {
+function OTPInput({
+  disabled,
+  onComplete,
+}: {
+  disabled: boolean;
+  onComplete: () => void;
+}) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
