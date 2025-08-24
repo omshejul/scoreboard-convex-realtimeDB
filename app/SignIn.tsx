@@ -1,16 +1,19 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Spinner, ArrowLeft, PaperPlaneTilt, CheckCircle, XCircle, ArrowCounterClockwise } from "phosphor-react";
 
 export function SignIn() {
   const { signIn } = useAuthActions();
   const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resendConfirmation, setResendConfirmation] = useState<boolean>(false);
 
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoading(true);
+    setIsSendingCode(true);
     setError(null);
 
     try {
@@ -26,13 +29,13 @@ export function SignIn() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send code");
     } finally {
-      setIsLoading(false);
+      setIsSendingCode(false);
     }
   };
 
   const handleCodeSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoading(true);
+    setIsVerifyingCode(true);
     setError(null);
 
     try {
@@ -44,6 +47,12 @@ export function SignIn() {
       }
 
       await signIn("resend-otp", formData);
+      
+      // Only set timeout on successful verification
+      setTimeout(() => {
+        setIsVerifyingCode(false);
+      }, 5000);
+
     } catch (err) {
       // Handle specific Convex Auth errors
       if (err instanceof Error) {
@@ -60,19 +69,19 @@ export function SignIn() {
       } else {
         setError("Invalid verification code. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
+      // Immediately set verifying to false on error
+      setIsVerifyingCode(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen font-plusJakartaSans flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg/5 border border-neutral-400/30 overflow-hidden">
+        <div className="">
           <div className="px-8 py-10">
             <motion.div
               initial={{ opacity: 0 }}
@@ -81,11 +90,16 @@ export function SignIn() {
               className="text-center mb-8"
             >
               <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                Welcome to Scoreboard
+                <span className=" whitespace-nowrap">
+                  Welcome to
+                </span>{" "}
+                <span className="text-blue-500 dark:text-blue-400 font-sans text-2xl ml-2 font-bold">
+                  Scoreboard
+                </span>
               </h1>
               <p className="text-neutral-600 dark:text-neutral-400">
                 {step === "signIn"
-                  ? "Enter your email to get started"
+                  ? ""
                   : "Check your email for the code"}
               </p>
             </motion.div>
@@ -95,7 +109,7 @@ export function SignIn() {
                 <EmailForm
                   key="email"
                   onSubmit={handleEmailSubmit}
-                  isLoading={isLoading}
+                  isLoading={isSendingCode}
                   error={error}
                 />
               ) : (
@@ -104,8 +118,10 @@ export function SignIn() {
                   email={step.email}
                   onSubmit={handleCodeSubmit}
                   onBack={() => setStep("signIn")}
-                  isLoading={isLoading}
+                  isVerifying={isVerifyingCode}
                   error={error}
+                  setResendConfirmation={setResendConfirmation}
+                  resendConfirmation={resendConfirmation}
                 />
               )}
             </AnimatePresence>
@@ -146,38 +162,41 @@ function EmailForm({
           type="email"
           required
           disabled={isLoading}
-          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           placeholder="Enter your email"
         />
       </div>
 
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-3 bg-red-50 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm"
-        >
-          {error}
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm flex items-center gap-2"
+          >
+            <XCircle size={16} />
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.button
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
       >
         {isLoading ? (
           <>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
-            />
+            <Spinner size={20} className="mr-2 animate-spin" />
             Sending code...
           </>
         ) : (
-          "Send verification code"
+          <>
+            <PaperPlaneTilt size={20} className="mr-2" />
+            Send verification code
+          </>
         )}
       </motion.button>
     </motion.form>
@@ -188,17 +207,22 @@ function CodeForm({
   email,
   onSubmit,
   onBack,
-  isLoading,
+  isVerifying,
   error,
+  setResendConfirmation,
+  resendConfirmation,
 }: {
   email: string;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onBack: () => void;
-  isLoading: boolean;
+  isVerifying: boolean;
   error: string | null;
+  setResendConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+  resendConfirmation: boolean;
 }) {
   const { signIn } = useAuthActions();
   const [isResending, setIsResending] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleResendCode = async () => {
     setIsResending(true);
@@ -206,6 +230,10 @@ function CodeForm({
       const formData = new FormData();
       formData.append("email", email);
       await signIn("resend-otp", formData);
+      setResendConfirmation(true);
+      setTimeout(() => {
+        setResendConfirmation(false);
+      }, 3000);
     } catch (err) {
       console.error("Failed to resend code:", err);
     } finally {
@@ -229,7 +257,7 @@ function CodeForm({
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-6">
+      <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
         <div>
           <label
             htmlFor="code"
@@ -237,35 +265,49 @@ function CodeForm({
           >
             Verification code
           </label>
-          <OTPInput disabled={isLoading} />
+          <OTPInput disabled={isVerifying} onComplete={() => formRef.current?.requestSubmit()} />
         </div>
 
         <input name="email" value={email} type="hidden" />
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
-          >
-            {error}
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm flex items-center gap-2"
+            >
+              <XCircle size={16} />
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {resendConfirmation && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-800 rounded-xl text-green-700 dark:text-green-300 text-sm text-center flex items-center gap-2 justify-center"
+            >
+              <CheckCircle size={16} />
+              Verification code resent!
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="space-y-3">
           <motion.button
             type="submit"
-            disabled={isLoading}
+            disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isLoading ? (
+            {isVerifying ? (
               <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
-                />
+                <Spinner size={20} className="mr-2 animate-spin" />
                 Verifying...
               </>
             ) : (
@@ -277,20 +319,28 @@ function CodeForm({
             <motion.button
               type="button"
               onClick={handleResendCode}
-              disabled={isLoading || isResending}
+              disabled={isVerifying || isResending}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {isResending ? "Sending..." : "Resend code"}
+              {isResending ? (
+                "Sending..."
+              ) : (
+                <>
+                  <ArrowCounterClockwise size={16} className="mr-2" />
+                  Resend code
+                </>
+              )}
             </motion.button>
 
             <motion.button
               type="button"
               onClick={onBack}
-              disabled={isLoading}
+              disabled={isVerifying}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
             >
+              <ArrowLeft size={20} className="mr-2" />
               Back to email
             </motion.button>
           </div>
@@ -300,7 +350,7 @@ function CodeForm({
   );
 }
 // MARK: OTPInput
-function OTPInput({ disabled }: { disabled: boolean }) {
+function OTPInput({ disabled, onComplete }: { disabled: boolean, onComplete: () => void }) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -330,6 +380,11 @@ function OTPInput({ disabled }: { disabled: boolean }) {
     if (hiddenInput) {
       hiddenInput.value = code;
     }
+
+    // Auto submit when all digits are filled
+    if (code.length === 4) {
+      onComplete();
+    }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -345,26 +400,28 @@ function OTPInput({ disabled }: { disabled: boolean }) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 justify-center">
-        {Array.from({ length: 4 }, (_, i) => (
-          <motion.input
-            key={i}
-            ref={(el) => {
-              inputRefs.current[i] = el;
-            }}
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={4} // Allow paste
-            disabled={disabled}
-            onChange={(e) => handleChange(i, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(i, e)}
-            onFocus={(e) => e.target.select()}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="w-10 h-10 text-black dark:text-neutral-100 text-center text-base font-mono font-bold border-2 border-neutral-300 dark:border-neutral-700 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          />
-        ))}
+        <AnimatePresence>
+          {Array.from({ length: 4 }, (_, i) => (
+            <motion.input
+              key={i}
+              ref={(el) => {
+                inputRefs.current[i] = el;
+              }}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={4} // Allow paste
+              disabled={disabled}
+              onChange={(e) => handleChange(i, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              onFocus={(e) => e.target.select()}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="w-10 h-10 text-black dark:text-neutral-100 text-center text-base font-mono font-bold border-2 border-neutral-300 dark:border-neutral-700 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            />
+          ))}
+        </AnimatePresence>
       </div>
       <input name="code" type="hidden" />
       <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
