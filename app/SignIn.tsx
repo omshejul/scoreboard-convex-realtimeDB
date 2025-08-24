@@ -75,7 +75,7 @@ export function SignIn() {
   };
 
   return (
-    <div className="min-h-[80vh] font-plusJakartaSans flex items-center justify-center p-4">
+    <div className="min-h-svh font-plusJakartaSans flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -315,13 +315,13 @@ function CodeForm({
             )}
           </motion.button>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap justify-center">
             <motion.button
               type="button"
               onClick={handleResendCode}
               disabled={isVerifying || isResending}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isResending ? (
                 "Sending..."
@@ -338,7 +338,7 @@ function CodeForm({
               onClick={onBack}
               disabled={isVerifying}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
             >
               <ArrowLeft size={20} className="mr-2" />
               Back to email
