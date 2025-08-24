@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Spinner, ArrowLeft, PaperPlaneTilt, CheckCircle, XCircle, ArrowCounterClockwise } from "phosphor-react";
 
+// MARK: SignIn Component
 export function SignIn() {
   const { signIn } = useAuthActions();
   const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
@@ -132,6 +133,7 @@ export function SignIn() {
   );
 }
 
+// MARK: EmailForm Component
 function EmailForm({
   onSubmit,
   isLoading,
@@ -181,11 +183,12 @@ function EmailForm({
         )}
       </AnimatePresence>
 
+      {/* MARK: EmailForm Submit Button */}
       <motion.button
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full shadow-xl/5 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[3px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[3px] after:rounded-b-xl overflow-hidden"
+        className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
       >
         {isLoading ? (
           <>
@@ -203,6 +206,7 @@ function EmailForm({
   );
 }
 
+// MARK: CodeForm Component
 function CodeForm({
   email,
   onSubmit,
@@ -302,11 +306,12 @@ function CodeForm({
         </AnimatePresence>
 
         <div className="space-y-3">
+          {/* MARK: CodeForm Verify Button */}
           <motion.button
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full shadow-xl/5 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[3px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[3px] after:rounded-b-xl overflow-hidden"
+            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
           >
             {isVerifying ? (
               <>
@@ -319,6 +324,7 @@ function CodeForm({
           </motion.button>
 
           <div className="flex gap-3 flex-wrap justify-center">
+            {/* MARK: CodeForm Resend Button */}
             <motion.button
               type="button"
               onClick={handleResendCode}
@@ -336,6 +342,7 @@ function CodeForm({
               )}
             </motion.button>
 
+            {/* MARK: CodeForm Back Button */}
             <motion.button
               type="button"
               onClick={onBack}
@@ -352,7 +359,7 @@ function CodeForm({
     </motion.div>
   );
 }
-// MARK: OTPInput
+// MARK: OTPInput Component
 function OTPInput({ disabled, onComplete }: { disabled: boolean, onComplete: () => void }) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
