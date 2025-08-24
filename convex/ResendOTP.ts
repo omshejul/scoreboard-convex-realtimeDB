@@ -160,7 +160,7 @@ const createSignInEmailHtml = (token: string, email: string) => `
                                       class="mobile-text"
                                       data-source-file="emails/scoreboard-signin.tsx"
                                       data-source-line="62"
-                                      style="font-size:14px;line-height:22px;background-color:#fef3c7;border:1px solid #f59e0b;border-radius:8px;color:#92400e;font-family:-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, &#x27;Roboto&#x27;, &#x27;Oxygen&#x27;, &#x27;Ubuntu&#x27;, &#x27;Cantarell&#x27;, &#x27;Fira Sans&#x27;, &#x27;Droid Sans&#x27;, &#x27;Helvetica Neue&#x27;, sans-serif;margin:32px 0 0 0;padding:16px;margin-top:32px;margin-right:0;margin-bottom:0;margin-left:0">
+                                      style="font-size:14px;line-height:22px;background-color:#fffffb;border:1px solid #f59e0b;border-radius:8px;color:#92400e;font-family:-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, &#x27;Roboto&#x27;, &#x27;Oxygen&#x27;, &#x27;Ubuntu&#x27;, &#x27;Cantarell&#x27;, &#x27;Fira Sans&#x27;, &#x27;Droid Sans&#x27;, &#x27;Helvetica Neue&#x27;, sans-serif;margin:32px 0 0 0;padding:16px;margin-top:32px;margin-right:0;margin-bottom:0;margin-left:0">
                                       This code will expire in
                                       <strong
                                         data-source-file="emails/scoreboard-signin.tsx"
