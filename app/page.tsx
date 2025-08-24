@@ -28,8 +28,11 @@ function Scoreboard() {
   const parentRefLeft = useRef<HTMLDivElement>(null);
   const parentRefRight = useRef<HTMLDivElement>(null);
 
-  // Generate user-specific slug using user subject (shorter and cleaner)
-  const userSlug = currentUser?.subject ? `user-${currentUser.subject}` : null;
+  // Generate a stable user-specific slug.
+  // Some auth subjects include a transient suffix like "<stable>|<session>".
+  // Use only the stable part before the pipe to avoid duplicate scoreboards.
+  const stableSubject = currentUser?.subject?.split("|")[0];
+  const userSlug = stableSubject ? `user-${stableSubject}` : null;
 
   const scoreboard = useQuery(
     api.scoreboard.get,
