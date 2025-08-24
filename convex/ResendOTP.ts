@@ -83,12 +83,12 @@ const createSignInEmailHtml = (token: string, email: string) => `
                               class="mobile-header-padding"
                               data-source-file="emails/scoreboard-signin.tsx"
                               data-source-line="39">
-                              <div
-                                style="background-color:#3b82f6;border-radius:12px;color:#ffffff;display:inline-block;font-size:24px;font-weight:bold;height:48px;line-height:48px;margin-bottom:16px;text-align:center;width:48px"
+                              <img
+                                src="https://score.arthkin.com/favicon-256x256.png"
+                                alt="Scoreboard Logo"
+                                style="width:48px;height:48px;margin-bottom:16px;border-radius:12px"
                                 data-source-file="emails/scoreboard-signin.tsx"
-                                data-source-line="40">
-                                S
-                              </div>
+                                data-source-line="40" />
                               <h1
                                 class="mobile-heading"
                                 data-source-file="emails/scoreboard-signin.tsx"
@@ -195,7 +195,7 @@ const createSignInEmailHtml = (token: string, email: string) => `
                                       <strong
                                         data-source-file="emails/scoreboard-signin.tsx"
                                         data-source-line="70"
-                                        >The Scoreboard Team</strong
+                                        >The Scoreboard Team | TheOm.app</strong
                                       >
                                     </p>
                                   </td>
