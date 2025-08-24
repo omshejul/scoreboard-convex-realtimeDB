@@ -239,12 +239,12 @@ function Scoreboard() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              onClick={(e) => {
+              onTap={(e) => {
                 e.stopPropagation();
                 handleDecrement("left");
               }}
               whileTap={{ scale: 0.9 }}
-              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-pointer active:cursor-grabbing"
             >
               <Minus size={32} weight="bold" />
             </motion.button>
@@ -302,12 +302,12 @@ function Scoreboard() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              onClick={(e) => {
+              onTap={(e) => {
                 e.stopPropagation();
                 handleDecrement("right");
               }}
               whileTap={{ scale: 0.9 }}
-              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg"
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-pointer active:cursor-grabbing"
             >
               <Minus size={32} weight="bold" />
             </motion.button>

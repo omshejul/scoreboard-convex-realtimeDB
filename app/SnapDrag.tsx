@@ -55,6 +55,7 @@ export default function SnapDrag({
   const boxRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const [currentCorner, setCurrentCorner] = useState<Corner | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const getSnapBounds = useCallback(
     (parent: DOMRect, el: DOMRect, elNode: HTMLElement) => {
@@ -203,6 +204,7 @@ export default function SnapDrag({
   // Re-snap on orientation or parent/element resize so it stays aligned
   useEffect(() => {
     const handler = () => {
+      if (isDragging) return; // avoid fighting with the user's drag
       const fallback = currentCorner ?? initialCorner;
       resnapToCorner(fallback, true);
     };
@@ -233,6 +235,7 @@ export default function SnapDrag({
     inset,
     allowedCorners,
     resnapToCorner,
+    isDragging,
   ]);
 
   const onDragEnd = () => {
@@ -310,6 +313,7 @@ export default function SnapDrag({
         window.localStorage.setItem(storageKey, bestCorner);
       } catch {}
     }
+    setIsDragging(false);
   };
 
   return (
@@ -320,7 +324,8 @@ export default function SnapDrag({
       drag
       dragConstraints={parentRef}
       dragElastic={0.5}
-      dragMomentum
+      dragMomentum={false}
+      onDragStart={() => setIsDragging(true)}
       onDragEnd={onDragEnd}
     >
       {children}
