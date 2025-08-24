@@ -194,11 +194,11 @@ function Scoreboard() {
   };
 
   return (
-    <div className="grid grid-cols-2 h-full w-full overflow-hidden">
+    <div className="grid grid-cols-2 h-full w-full overflow-hidden font-plusJakartaSans">
       <div className="relative border-r border-black/20" ref={parentRefLeft}>
         <button
           onClick={() => handleIncrement("left")}
-          className="bg-red-500 w-full h-full flex flex-col items-center justify-center gap-3"
+          className="bg-red-500 cursor-n-resize w-full h-full flex flex-col items-center justify-center gap-3"
         >
           <AnimatePresence mode="wait">
             <motion.span
@@ -234,7 +234,7 @@ function Scoreboard() {
                 handleDecrement("left");
               }}
               whileTap={{ scale: 0.9 }}
-              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-pointer active:cursor-grabbing"
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-s-resize"
             >
               <Minus size={32} weight="bold" />
             </motion.button>
@@ -254,7 +254,7 @@ function Scoreboard() {
       <div className="relative" ref={parentRefRight}>
         <button
           onClick={() => handleIncrement("right")}
-          className="bg-blue-500 w-full h-full flex flex-col items-center justify-center gap-3"
+          className="bg-blue-500 cursor-n-resize w-full h-full flex flex-col items-center justify-center gap-3"
         >
           <AnimatePresence mode="wait">
             <motion.span
@@ -295,7 +295,7 @@ function Scoreboard() {
                 handleDecrement("right");
               }}
               whileTap={{ scale: 0.9 }}
-              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-pointer active:cursor-grabbing"
+              className="absolute w-16 h-16 rounded-full bg-black/20 border border-neutral-500/20 text-white text-sm font-bold flex items-center justify-center shadow-lg cursor-s-resize"
             >
               <Minus size={32} weight="bold" />
             </motion.button>
