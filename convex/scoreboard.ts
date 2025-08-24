@@ -1,6 +1,12 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+function deriveUserSlug(subject: string | undefined | null): string | null {
+  if (!subject) return null;
+  const stable = subject.split("|")[0];
+  return stable ? `user-${stable}` : null;
+}
+
 export const get = query({
   args: {
     slug: v.string(),
@@ -15,12 +21,61 @@ export const get = query({
   },
 });
 
+export const getForCurrentUser = query({
+  args: {},
+  handler: async ({ db, auth }) => {
+    const identity = await auth.getUserIdentity();
+    const slug = deriveUserSlug(identity?.subject);
+    if (!slug) return { left: 0, right: 0 };
+
+    const doc = await db
+      .query("scoreboard")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    return doc ?? { left: 0, right: 0 };
+  },
+});
+
 export const increment = mutation({
   args: {
     slug: v.string(),
     side: v.union(v.literal("left"), v.literal("right")),
   },
   handler: async ({ db }, { slug, side }) => {
+    const existing = await db
+      .query("scoreboard")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!existing) {
+      const left = side === "left" ? 1 : 0;
+      const right = side === "right" ? 1 : 0;
+      await db.insert("scoreboard", {
+        slug,
+        left,
+        right,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+      return;
+    }
+    const next = {
+      left: existing.left + (side === "left" ? 1 : 0),
+      right: existing.right + (side === "right" ? 1 : 0),
+      updatedAt: Date.now(),
+    };
+    await db.patch(existing._id, next);
+  },
+});
+
+export const incrementForCurrentUser = mutation({
+  args: {
+    side: v.union(v.literal("left"), v.literal("right")),
+  },
+  handler: async ({ db, auth }, { side }) => {
+    const identity = await auth.getUserIdentity();
+    const slug = deriveUserSlug(identity?.subject);
+    if (!slug) return;
+
     const existing = await db
       .query("scoreboard")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -68,11 +123,58 @@ export const decrement = mutation({
   },
 });
 
+export const decrementForCurrentUser = mutation({
+  args: {
+    side: v.union(v.literal("left"), v.literal("right")),
+  },
+  handler: async ({ db, auth }, { side }) => {
+    const identity = await auth.getUserIdentity();
+    const slug = deriveUserSlug(identity?.subject);
+    if (!slug) return;
+
+    const existing = await db
+      .query("scoreboard")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!existing) {
+      return; // Can't decrement if doesn't exist
+    }
+    const next = {
+      left: Math.max(0, existing.left - (side === "left" ? 1 : 0)),
+      right: Math.max(0, existing.right - (side === "right" ? 1 : 0)),
+      updatedAt: Date.now(),
+    };
+    await db.patch(existing._id, next);
+  },
+});
+
 export const reset = mutation({
   args: {
     slug: v.string(),
   },
   handler: async ({ db }, { slug }) => {
+    const existing = await db
+      .query("scoreboard")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (existing) {
+      await db.patch(existing._id, {
+        left: 0,
+        right: 0,
+        updatedAt: Date.now(),
+      });
+    }
+    return existing;
+  },
+});
+
+export const resetForCurrentUser = mutation({
+  args: {},
+  handler: async ({ db, auth }) => {
+    const identity = await auth.getUserIdentity();
+    const slug = deriveUserSlug(identity?.subject);
+    if (!slug) return null;
+
     const existing = await db
       .query("scoreboard")
       .withIndex("by_slug", (q) => q.eq("slug", slug))

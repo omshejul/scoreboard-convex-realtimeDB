@@ -28,16 +28,8 @@ function Scoreboard() {
   const parentRefLeft = useRef<HTMLDivElement>(null);
   const parentRefRight = useRef<HTMLDivElement>(null);
 
-  // Generate a stable user-specific slug.
-  // Some auth subjects include a transient suffix like "<stable>|<session>".
-  // Use only the stable part before the pipe to avoid duplicate scoreboards.
-  const stableSubject = currentUser?.subject?.split("|")[0];
-  const userSlug = stableSubject ? `user-${stableSubject}` : null;
-
-  const scoreboard = useQuery(
-    api.scoreboard.get,
-    userSlug ? { slug: userSlug } : "skip"
-  );
+  // Fetch scoreboard derived on the server from the authenticated user
+  const scoreboard = useQuery(api.scoreboard.getForCurrentUser, {});
 
   // Fix iOS viewport glitches on orientation change
   useEffect(() => {
@@ -86,9 +78,9 @@ function Scoreboard() {
       }
     };
   }, []);
-  const increment = useMutation(api.scoreboard.increment);
-  const decrement = useMutation(api.scoreboard.decrement);
-  const reset = useMutation(api.scoreboard.reset);
+  const increment = useMutation(api.scoreboard.incrementForCurrentUser);
+  const decrement = useMutation(api.scoreboard.decrementForCurrentUser);
+  const reset = useMutation(api.scoreboard.resetForCurrentUser);
 
   // Optimistic state for instant UI updates
   const [optimisticLeft, setOptimisticLeft] = useState<number | null>(null);
@@ -124,7 +116,7 @@ function Scoreboard() {
   const right = optimisticRight ?? scoreboard.right ?? 0;
 
   const handleIncrement = async (side: "left" | "right") => {
-    if (!userSlug || isUpdating) return;
+    if (isUpdating) return;
 
     setIsUpdating(true);
 
@@ -137,7 +129,7 @@ function Scoreboard() {
 
     try {
       // Then send the mutation to the server
-      await increment({ slug: userSlug, side });
+      await increment({ side });
     } catch (error) {
       console.error("Failed to increment:", error);
       // Reset optimistic state on error
@@ -149,7 +141,7 @@ function Scoreboard() {
   };
 
   const handleDecrement = async (side: "left" | "right") => {
-    if (!userSlug || isUpdating) return;
+    if (isUpdating) return;
 
     // Prevent going below 0
     const currentValue = side === "left" ? left : right;
@@ -166,7 +158,7 @@ function Scoreboard() {
 
     try {
       // Then send the mutation to the server
-      await decrement({ slug: userSlug, side });
+      await decrement({ side });
     } catch (error) {
       console.error("Failed to decrement:", error);
       // Reset optimistic state on error
@@ -178,7 +170,7 @@ function Scoreboard() {
   };
 
   const handleReset = async () => {
-    if (!userSlug || isUpdating) return;
+    if (isUpdating) return;
 
     setIsUpdating(true);
 
@@ -188,7 +180,7 @@ function Scoreboard() {
 
     try {
       // Then send the mutation to the server
-      await reset({ slug: userSlug });
+      await reset({});
       setShowResetConfirm(false);
     } catch (error) {
       console.error("Failed to reset:", error);
@@ -229,9 +221,7 @@ function Scoreboard() {
           <SnapDrag
             parentRef={parentRefLeft}
             inset={16}
-            storageKey={
-              userSlug ? `${userSlug}-left-decrement-btn-corner` : undefined
-            }
+            storageKey={`left-decrement-btn-corner`}
             allowedCorners={["top-left", "top-right", "bottom-right"]}
             className="w-16 h-16"
           >
@@ -287,9 +277,7 @@ function Scoreboard() {
           <SnapDrag
             parentRef={parentRefRight}
             inset={16}
-            storageKey={
-              userSlug ? `${userSlug}-right-decrement-btn-corner` : undefined
-            }
+            storageKey={`right-decrement-btn-corner`}
             allowedCorners={[
               "top-left",
               "top-right",
