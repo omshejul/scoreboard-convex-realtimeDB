@@ -185,7 +185,7 @@ function EmailForm({
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+        className="w-full shadow-xl/5 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[3px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[3px] after:rounded-b-xl overflow-hidden"
       >
         {isLoading ? (
           <>
@@ -265,7 +265,10 @@ function CodeForm({
           >
             Verification code
           </label>
-          <OTPInput disabled={isVerifying} onComplete={() => formRef.current?.requestSubmit()} />
+          <OTPInput
+            disabled={isVerifying}
+            onComplete={() => formRef.current?.requestSubmit()}
+          />
         </div>
 
         <input name="email" value={email} type="hidden" />
@@ -303,7 +306,7 @@ function CodeForm({
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full shadow-xl/5 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[3px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[3px] after:rounded-b-xl overflow-hidden"
           >
             {isVerifying ? (
               <>
@@ -321,7 +324,7 @@ function CodeForm({
               onClick={handleResendCode}
               disabled={isVerifying || isResending}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center border border-neutral-300 dark:border-neutral-700"
             >
               {isResending ? (
                 "Sending..."
@@ -338,7 +341,7 @@ function CodeForm({
               onClick={onBack}
               disabled={isVerifying}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center border border-neutral-300 dark:border-neutral-700"
             >
               <ArrowLeft size={20} className="mr-2" />
               Back to email
