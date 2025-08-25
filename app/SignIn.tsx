@@ -190,7 +190,7 @@ function EmailForm({
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full custom-bordered shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
+        className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[0px] after:h-[3px] after:bg-black/90 after:blur-[12px] after:rounded-b-xl overflow-hidden text-shadow-lg"
       >
         {isLoading ? (
           <>
@@ -313,7 +313,7 @@ function CodeForm({
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full custom-bordered shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
+            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[0px] after:h-[3px] after:bg-black/90 after:blur-[12px] after:rounded-b-xl overflow-hidden text-shadow-lg"
           >
             {isVerifying ? (
               <>
