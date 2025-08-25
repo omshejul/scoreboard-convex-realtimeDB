@@ -320,26 +320,39 @@ function Scoreboard() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl shadow-lg border max-w-md w-full p-6"
+              className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 max-w-md w-full p-6"
             >
-              <div className="flex justify-end mb-4">
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => signOut()}
-                  className="text-sm px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors flex items-center gap-1 font-medium"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  Sign out
-                </motion.button>
-              </div>
-
               <div className="flex flex-col space-y-2 text-center sm:text-left">
-                <h2 className="text-lg text-black font-semibold">
-                  Reset scoreboard?
-                </h2>
-                <p className="text-sm text-slate-600">
+                <div className="flex justify-between">
+                  <h2 className="text-lg text-black dark:text-white font-semibold">
+                    Reset scoreboard?
+                  </h2>
+                  <div className="flex justify-end mb-4">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => signOut()}
+                      className="text-sm px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors flex items-center gap-1 font-medium"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      Sign out
+                    </motion.button>
+                  </div>
+                </div>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   This will reset both scores to zero. This action cannot be
                   undone.
                 </p>
@@ -349,14 +362,14 @@ function Scoreboard() {
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowResetConfirm(false)}
-                  className="inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                  className="inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 h-10 px-4 py-2"
                 >
                   Cancel
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={handleReset}
-                  className="text-white border border-red-500 bg-red-500 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+                  className="text-white border border-red-500 bg-red-500 dark:bg-red-600 dark:border-red-700 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
                 >
                   Reset
                 </motion.button>
