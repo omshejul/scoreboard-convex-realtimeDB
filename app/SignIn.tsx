@@ -166,7 +166,7 @@ function EmailForm({
           type="email"
           required
           disabled={isLoading}
-          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           placeholder="Enter your email"
         />
       </div>
@@ -190,7 +190,7 @@ function EmailForm({
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
+        className="w-full custom-bordered shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
       >
         {isLoading ? (
           <>
@@ -313,7 +313,7 @@ function CodeForm({
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
+            className="w-full custom-bordered shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[3px] after:h-[3px] after:bg-black/20 after:blur-[4px] after:rounded-b-xl overflow-hidden"
           >
             {isVerifying ? (
               <>
@@ -436,7 +436,7 @@ function OTPInput({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="w-10 h-10 text-black dark:text-neutral-100 text-center text-base font-mono font-bold border-2 border-neutral-300 dark:border-neutral-700 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-10 h-10 text-black dark:text-neutral-100 text-center text-base font-mono font-bold border-2 border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             />
           ))}
         </AnimatePresence>
