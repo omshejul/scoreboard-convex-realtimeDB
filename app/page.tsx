@@ -5,6 +5,7 @@ import { api } from "../convex/_generated/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise } from "phosphor-react";
 
@@ -27,6 +28,7 @@ function Scoreboard() {
   const currentUser = useQuery(api.auth.currentUser);
   const parentRefLeft = useRef<HTMLDivElement>(null);
   const parentRefRight = useRef<HTMLDivElement>(null);
+  const { signOut } = useAuthActions();
 
   // Fetch scoreboard derived on the server from the authenticated user
   const scoreboard = useQuery(api.scoreboard.getForCurrentUser, {});
@@ -206,7 +208,7 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="font-bold font-sans tracking-tight"
+              className="text-white font-bold font-sans tracking-tight"
               style={{ fontSize: "20vw" }}
             >
               {left}
@@ -262,7 +264,7 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="font-bold font-sans tracking-tight"
+              className="text-white font-bold font-sans tracking-tight"
               style={{ fontSize: "20vw" }}
             >
               {right}
@@ -320,6 +322,19 @@ function Scoreboard() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl shadow-lg border max-w-md w-full p-6"
             >
+              <div className="flex justify-end mb-4">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => signOut()}
+                  className="text-sm px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors flex items-center gap-1 font-medium"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Sign out
+                </motion.button>
+              </div>
+
               <div className="flex flex-col space-y-2 text-center sm:text-left">
                 <h2 className="text-lg text-black font-semibold">
                   Reset scoreboard?
