@@ -93,3 +93,15 @@ body {
     @slot;
   }
 }
+
+.custom-bordered {
+  @apply border;
+  border-top-color: rgb(255 255 255 / 0.4);
+  border-bottom-color: rgb(0 0 0 / 0.4);
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  border-radius: 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
