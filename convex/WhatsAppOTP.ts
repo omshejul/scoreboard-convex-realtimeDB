@@ -30,7 +30,7 @@ export const WhatsAppOTP = Email({
       },
       body: JSON.stringify({
         to: phone,
-        body: `Your Scoreboard verification code is: ${token}`,
+        body: `*${token}* is your Scoreboard verification code`,
       }),
     });
 

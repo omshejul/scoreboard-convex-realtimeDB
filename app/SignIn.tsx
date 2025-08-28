@@ -10,6 +10,7 @@ import {
   ArrowCounterClockwise,
   EnvelopeSimple,
 } from "phosphor-react";
+import { PhoneInput } from "./PhoneInput";
 import { FaWhatsapp } from "react-icons/fa";
 // MARK: SignIn Component
 export function SignIn() {
@@ -22,6 +23,7 @@ export function SignIn() {
   const [error, setError] = useState<string | null>(null);
   const [resendConfirmation, setResendConfirmation] = useState<boolean>(false);
   const [method, setMethod] = useState<"email" | "whatsapp">("email");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,16 +41,15 @@ export function SignIn() {
         await signIn("resend-otp", raw);
         setStep({ method, identifier: email });
       } else {
-        const phone = ((raw.get("phone") as string) || "").trim();
-        if (!phone || !/^\+?[0-9]{8,15}$/.test(phone)) {
+        if (!phoneNumber || !/^\+?[0-9]{8,15}$/.test(phoneNumber)) {
           throw new Error(
             "Enter a valid phone in E.164 format, e.g. +1234567890"
           );
         }
         const fd = new FormData();
-        fd.append("email", phone);
+        fd.append("email", phoneNumber);
         await signIn("whatsapp-otp", fd);
-        setStep({ method, identifier: phone });
+        setStep({ method, identifier: phoneNumber });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send code");
@@ -117,7 +118,7 @@ export function SignIn() {
         className="w-full max-w-md"
       >
         <div className="">
-          <div className="px-8 py-10">
+          <div className="px-4 md:px-8 py-10">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -148,6 +149,8 @@ export function SignIn() {
                   error={error}
                   method={method}
                   setMethod={setMethod}
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
                 />
               ) : (
                 <CodeForm
@@ -177,12 +180,16 @@ function EmailForm({
   error,
   method,
   setMethod,
+  phoneNumber,
+  setPhoneNumber,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
   error: string | null;
   method: "email" | "whatsapp";
   setMethod: React.Dispatch<React.SetStateAction<"email" | "whatsapp">>;
+  phoneNumber: string;
+  setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
 }) {
   return (
     <motion.form
@@ -245,14 +252,12 @@ function EmailForm({
             >
               WhatsApp number
             </label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              required
+            <PhoneInput
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              placeholder="Phone number"
               disabled={isLoading}
-              className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              placeholder="e.g. +917775977750"
+              className="w-full"
             />
           </>
         )}
