@@ -68,6 +68,9 @@ A modern, real-time scoreboard application built with Next.js, Convex, and Frame
    NEXT_PUBLIC_CONVEX_URL=<your-convex-url>
    AUTH_RESEND_KEY=<your-resend-api-key>
    CONVEX_SITE_URL=<your-site-url>
+   # WhatsApp OTP (Node-RED gateway)
+   WHATSAPP_API_URL=https://nodered.omshejul.com/api/v1/whatsapp/message
+   WHATSAPP_BEARER=XYZ
    ```
 
 5. **Start the development server**

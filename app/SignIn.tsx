@@ -8,16 +8,20 @@ import {
   CheckCircle,
   XCircle,
   ArrowCounterClockwise,
+  EnvelopeSimple,
 } from "phosphor-react";
-
+import { FaWhatsapp } from "react-icons/fa";
 // MARK: SignIn Component
 export function SignIn() {
   const { signIn } = useAuthActions();
-  const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
+  const [step, setStep] = useState<
+    "signIn" | { method: "email" | "whatsapp"; identifier: string }
+  >("signIn");
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendConfirmation, setResendConfirmation] = useState<boolean>(false);
+  const [method, setMethod] = useState<"email" | "whatsapp">("email");
 
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,15 +29,27 @@ export function SignIn() {
     setError(null);
 
     try {
-      const formData = new FormData(event.currentTarget);
-      const email = formData.get("email") as string;
+      const raw = new FormData(event.currentTarget);
 
-      if (!email || !email.includes("@")) {
-        throw new Error("Please enter a valid email address");
+      if (method === "email") {
+        const email = (raw.get("email") as string) || "";
+        if (!email || !email.includes("@")) {
+          throw new Error("Please enter a valid email address");
+        }
+        await signIn("resend-otp", raw);
+        setStep({ method, identifier: email });
+      } else {
+        const phone = ((raw.get("phone") as string) || "").trim();
+        if (!phone || !/^\+?[0-9]{8,15}$/.test(phone)) {
+          throw new Error(
+            "Enter a valid phone in E.164 format, e.g. +1234567890"
+          );
+        }
+        const fd = new FormData();
+        fd.append("email", phone);
+        await signIn("whatsapp-otp", fd);
+        setStep({ method, identifier: phone });
       }
-
-      await signIn("resend-otp", formData);
-      setStep({ email });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send code");
     } finally {
@@ -54,7 +70,19 @@ export function SignIn() {
         throw new Error("Please enter a complete 4-digit code");
       }
 
-      await signIn("resend-otp", formData);
+      // Ensure the provider receives the identifier under the "email" key
+      const identifier =
+        step !== "signIn" ? step.identifier : formData.get("email");
+      const fd = new FormData();
+      fd.append("code", code);
+      fd.append("email", String(identifier));
+
+      await signIn(
+        step !== "signIn" && step.method === "whatsapp"
+          ? "whatsapp-otp"
+          : "resend-otp",
+        fd
+      );
 
       // Only set timeout on successful verification
       setTimeout(() => {
@@ -103,7 +131,11 @@ export function SignIn() {
                 </span>
               </h1>
               <p className="text-neutral-600 dark:text-neutral-400">
-                {step === "signIn" ? "" : "Check your email for the code"}
+                {step === "signIn"
+                  ? ""
+                  : step.method === "email"
+                  ? "Check your email for the code"
+                  : "Check your WhatsApp for the code"}
               </p>
             </motion.div>
 
@@ -114,11 +146,14 @@ export function SignIn() {
                   onSubmit={handleEmailSubmit}
                   isLoading={isSendingCode}
                   error={error}
+                  method={method}
+                  setMethod={setMethod}
                 />
               ) : (
                 <CodeForm
                   key="code"
-                  email={step.email}
+                  identifier={step.identifier}
+                  method={step.method}
                   onSubmit={handleCodeSubmit}
                   onBack={() => setStep("signIn")}
                   isVerifying={isVerifyingCode}
@@ -140,10 +175,14 @@ function EmailForm({
   onSubmit,
   isLoading,
   error,
+  method,
+  setMethod,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
   error: string | null;
+  method: "email" | "whatsapp";
+  setMethod: React.Dispatch<React.SetStateAction<"email" | "whatsapp">>;
 }) {
   return (
     <motion.form
@@ -153,22 +192,70 @@ function EmailForm({
       onSubmit={onSubmit}
       className="space-y-6"
     >
-      <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+      <div className="flex gap-2 border border-neutral-200 dark:border-neutral-800 p-1 rounded-full text-sm">
+        <button
+          type="button"
+          onClick={() => setMethod("email")}
+          className={`flex-1 py-2 rounded-full transition-colors flex items-center justify-center gap-2 ${
+            method === "email"
+              ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
+              : "text-neutral-600 dark:text-neutral-400"
+          }`}
         >
-          Email address
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          disabled={isLoading}
-          className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          placeholder="Enter your email"
-        />
+          <EnvelopeSimple size={16} />
+          Email
+        </button>
+        <button
+          type="button"
+          onClick={() => setMethod("whatsapp")}
+          className={`flex-1 py-2 rounded-full transition-colors flex items-center justify-center gap-2 ${
+            method === "whatsapp"
+              ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
+              : "text-neutral-600 dark:text-neutral-400"
+          }`}
+        >
+          <FaWhatsapp size={16} />
+          WhatsApp
+        </button>
+      </div>
+      <div>
+        {method === "email" ? (
+          <>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+            >
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              disabled={isLoading}
+              className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              placeholder="Enter your email"
+            />
+          </>
+        ) : (
+          <>
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+            >
+              WhatsApp number
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              required
+              disabled={isLoading}
+              className="w-full px-4 text-black dark:text-neutral-100 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              placeholder="e.g. +917775977750"
+            />
+          </>
+        )}
       </div>
 
       <AnimatePresence>
@@ -210,7 +297,8 @@ function EmailForm({
 
 // MARK: CodeForm Component
 function CodeForm({
-  email,
+  identifier,
+  method,
   onSubmit,
   onBack,
   isVerifying,
@@ -218,7 +306,8 @@ function CodeForm({
   setResendConfirmation,
   resendConfirmation,
 }: {
-  email: string;
+  identifier: string;
+  method: "email" | "whatsapp";
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onBack: () => void;
   isVerifying: boolean;
@@ -234,8 +323,11 @@ function CodeForm({
     setIsResending(true);
     try {
       const formData = new FormData();
-      formData.append("email", email);
-      await signIn("resend-otp", formData);
+      formData.append("email", identifier);
+      await signIn(
+        method === "whatsapp" ? "whatsapp-otp" : "resend-otp",
+        formData
+      );
       setResendConfirmation(true);
       setTimeout(() => {
         setResendConfirmation(false);
@@ -258,7 +350,7 @@ function CodeForm({
         <p className="text-sm text-neutral-600  dark:text-neutral-400 mb-6">
           We sent a verification code to{" "}
           <span className="font-medium text-neutral-900  dark:text-neutral-100">
-            {email}
+            {identifier}
           </span>
         </p>
       </div>
@@ -277,7 +369,7 @@ function CodeForm({
           />
         </div>
 
-        <input name="email" value={email} type="hidden" />
+        <input name="email" value={identifier} type="hidden" />
 
         <AnimatePresence>
           {error && (
@@ -353,7 +445,7 @@ function CodeForm({
               className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center border border-neutral-300 dark:border-neutral-700"
             >
               <ArrowLeft size={20} className="mr-2" />
-              Back to email
+              Back
             </motion.button>
           </div>
         </div>
@@ -443,7 +535,7 @@ function OTPInput({
       </div>
       <input name="code" type="hidden" />
       <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-        Enter the 4-digit code from your email
+        Enter the 4-digit code
       </p>
     </div>
   );

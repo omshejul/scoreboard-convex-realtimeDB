@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as ResendOTP from "../ResendOTP.js";
+import type * as WhatsAppOTP from "../WhatsAppOTP.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as scoreboard from "../scoreboard.js";
@@ -28,6 +29,7 @@ import type * as scoreboard from "../scoreboard.js";
  */
 declare const fullApi: ApiFromModules<{
   ResendOTP: typeof ResendOTP;
+  WhatsAppOTP: typeof WhatsAppOTP;
   auth: typeof auth;
   http: typeof http;
   scoreboard: typeof scoreboard;
