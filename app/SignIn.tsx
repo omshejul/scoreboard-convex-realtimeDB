@@ -282,19 +282,28 @@ function EmailForm({
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[0px] after:h-[3px] after:bg-black/90 after:blur-[12px] after:rounded-b-xl overflow-hidden text-shadow-lg"
+        className="w-full shadow-lg shadow-blue-500/20 hover bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
       >
-        {isLoading ? (
-          <>
-            <Spinner size={20} className="mr-2 animate-spin" />
-            Sending code...
-          </>
-        ) : (
-          <>
-            <PaperPlaneTilt size={20} className="mr-2" />
-            Send verification code
-          </>
-        )}
+        <div
+          className={`w-full bg-gradient-to-t 
+          ${
+            isLoading
+              ? "from-blue-400 to-blue-400"
+              : "from-blue-500 to-blue-600 group-hover:from-blue-500 group-hover:to-blue-700"
+          }    text-white font-medium py-3 px-4 rounded-full transition-all disabled:cursor-not-allowed flex items-center justify-center text-shadow-lg`}
+        >
+          {isLoading ? (
+            <>
+              <Spinner size={20} className="mr-2 animate-spin" />
+              Sending code...
+            </>
+          ) : (
+            <>
+              <PaperPlaneTilt size={20} className="mr-2" />
+              Send verification code
+            </>
+          )}
+        </div>
       </motion.button>
     </motion.form>
   );
@@ -410,16 +419,25 @@ function CodeForm({
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center relative before:absolute before:inset-x-0 before:top-[3px] before:h-[3px] before:bg-white/20 before:blur-[4px] before:rounded-t-xl after:absolute after:inset-x-0 after:bottom-[0px] after:h-[3px] after:bg-black/90 after:blur-[12px] after:rounded-b-xl overflow-hidden text-shadow-lg"
+            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isVerifying ? (
-              <>
-                <Spinner size={20} className="mr-2 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Verify code"
-            )}
+            <div
+              className={`w-full bg-gradient-to-t 
+          ${
+            isVerifying
+              ? "from-blue-400 to-blue-400"
+              : "from-blue-500 to-blue-600 group-hover:from-blue-500 group-hover:to-blue-700 "
+          }   text-white font-medium py-3 px-4 rounded-full transition-all disabled:cursor-not-allowed flex items-center justify-center text-shadow-lg`}
+            >
+              {isVerifying ? (
+                <>
+                  <Spinner size={20} className="mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                "Verify code"
+              )}
+            </div>
           </motion.button>
 
           <div className="flex gap-3 flex-wrap justify-center">
