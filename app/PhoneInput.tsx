@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { getAllCountries } from "@/lib/countries";
 import { parsePhoneNumberFromString } from "libphonenumber-js/min";
+import ReactCountryFlag from "react-country-flag";
 
 import type { Country } from "@/lib/countries";
 
@@ -148,17 +149,22 @@ export function PhoneInput({
             }
           }}
         >
-          <SelectTrigger className="w-min bg-neutral-500/10 h-12 border-r-0 rounded-l-xl rounded-r-none">
+          <SelectTrigger className="w-max cursor-pointer bg-neutral-500/10 h-12 border-r-0 border-neutral-300 dark:border-neutral-700 rounded-l-xl rounded-r-none">
             <SelectValue>
               <div className="flex items-center gap-2">
-                <span className="text-base">{selectedCountry.flag}</span>
+                <ReactCountryFlag
+                  countryCode={selectedCountry.code}
+                  svg
+                  aria-label={selectedCountry.name}
+                  style={{ width: "1.125rem", height: "1.125rem" }}
+                />
                 <span className="text-xs font-medium">
                   {selectedCountry.dialCode}
                 </span>
               </div>
             </SelectValue>
           </SelectTrigger>
-          <SelectContent className="max-h-[40vh] overflow-y-auto">
+          <SelectContent className="max-h-[40vh] overflow-y-auto font-plusJakartaSans">
             <SelectGroup>
               <SelectLabel>Countries</SelectLabel>
               {displayCountries.map((country) => (
@@ -168,7 +174,12 @@ export function PhoneInput({
                   textValue={`${country.name} ${country.dialCode} ${country.code}`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{country.flag}</span>
+                    <ReactCountryFlag
+                      countryCode={country.code}
+                      svg
+                      aria-label={country.name}
+                      style={{ width: "1rem", height: "1rem" }}
+                    />
                     <div className="flex-1 min-w-0 truncate">
                       <div className="text-sm font-medium truncate">
                         {country.name}
@@ -193,7 +204,7 @@ export function PhoneInput({
             onChange={handlePhoneChange}
             disabled={disabled}
             placeholder={placeholder}
-            className="w-full h-12 px-3 border border-l-0 border-neutral-300 dark:border-neutral-700 rounded-r-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-black dark:text-neutral-100"
+            className="w-full h-12 px-3 border border-neutral-300 dark:border-neutral-700 rounded-r-xl focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-black dark:text-neutral-100"
           />
         </div>
       </div>
