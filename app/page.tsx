@@ -208,13 +208,13 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-white font-bold font-sans tracking-tight"
+              className="text-white font-bold font-sans"
               style={{ fontSize: "20vw" }}
             >
               {left}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">
+          <span className="text-white text-sm font-mono tracking-widest -translate-y-[150%]">
             LEFT
           </span>
         </button>
@@ -264,13 +264,13 @@ function Scoreboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-white font-bold font-sans tracking-tight"
+              className="text-white font-bold font-sans"
               style={{ fontSize: "20vw" }}
             >
               {right}
             </motion.span>
           </AnimatePresence>
-          <span className="text-sm font-mono tracking-widest -translate-y-[150%]">
+          <span className="text-white text-sm font-mono tracking-widest -translate-y-[150%]">
             RIGHT
           </span>
         </button>
@@ -369,7 +369,7 @@ function Scoreboard() {
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={handleReset}
-                  className="text-white border border-red-500 bg-red-500 dark:bg-red-600 dark:border-red-700 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+                  className="text-white border border-red-500 dark:bg-red-600 dark:border-red-500 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
                 >
                   Reset
                 </motion.button>
