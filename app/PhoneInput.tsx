@@ -34,8 +34,8 @@ export function PhoneInput({
   className = "",
 }: PhoneInputProps) {
   const [selectedCountry, setSelectedCountry] = React.useState<Country>(
-    allCountries.find((c) => c.code === "GB") || allCountries[0]
-  ); // Default to UK; may be overridden by IP or value
+    allCountries.find((c) => c.code === "US") || allCountries[0]
+  ); // Default to USA; may be overridden by IP or value
   const [phoneNumber, setPhoneNumber] = React.useState("");
 
   // Try to detect the user's country by IP on mount (only when no value is provided)
@@ -56,13 +56,13 @@ export function PhoneInput({
         if (byIp) {
           setSelectedCountry(byIp);
         } else {
-          const uk = allCountries.find((c) => c.code === "GB");
-          if (uk) setSelectedCountry(uk);
+          const us = allCountries.find((c) => c.code === "US");
+          if (us) setSelectedCountry(us);
         }
       })
       .catch(() => {
-        const uk = allCountries.find((c) => c.code === "GB");
-        if (uk) setSelectedCountry(uk);
+        const us = allCountries.find((c) => c.code === "US");
+        if (us) setSelectedCountry(us);
       });
   }, [value]);
 
@@ -149,7 +149,7 @@ export function PhoneInput({
             }
           }}
         >
-          <SelectTrigger className="w-max cursor-pointer bg-neutral-500/10 h-12 border-r-0 border-neutral-300 dark:border-neutral-700 rounded-l-xl rounded-r-none">
+          <SelectTrigger className="w-max cursor-pointer bg-neutral-500/10 h-12 border-r-0 border-neutral-300 dark:border-neutral-700 rounded-l-xl rounded-r-none outline-none focus:outline-none focus:ring-0">
             <SelectValue>
               <div className="flex items-center gap-2">
                 <ReactCountryFlag
