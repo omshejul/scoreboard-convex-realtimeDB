@@ -52,7 +52,21 @@ export function SignIn() {
         setStep({ method, identifier: phoneNumber });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send code");
+      const message =
+        err instanceof Error ? err.message : "Failed to send code";
+      if (method === "whatsapp") {
+        // Preserve client-side validation message
+        if (message.toLowerCase().includes("enter a valid phone")) {
+          setError(message);
+        } else if (message.includes("Failed to send WhatsApp OTP")) {
+          setError("Message could not be delivered.");
+        } else {
+          // Generic friendly message for WhatsApp delivery failures
+          setError("Message could not be delivered.");
+        }
+      } else {
+        setError(message);
+      }
     } finally {
       setIsSendingCode(false);
     }
@@ -91,19 +105,22 @@ export function SignIn() {
       }, 5000);
     } catch (err) {
       // Handle specific Convex Auth errors
-      if (err instanceof Error) {
-        if (
-          err.message.includes("Could not verify code") ||
-          err.message.includes("verification")
-        ) {
-          setError("Invalid verification code. Please check and try again.");
-        } else if (err.message.includes("expired")) {
-          setError("Verification code has expired. Please request a new one.");
-        } else {
-          setError(err.message);
-        }
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Invalid verification code. Please try again.";
+      if (
+        message.includes("Could not verify code") ||
+        message.toLowerCase().includes("verification")
+      ) {
+        setError("Invalid verification code. Please check and try again.");
+      } else if (message.toLowerCase().includes("expired")) {
+        setError("Verification code has expired. Please request a new one.");
+      } else if (message.includes("Failed to send WhatsApp OTP")) {
+        // If for some reason a send error bubbles here, keep it friendly
+        setError("Message could not be delivered.");
       } else {
-        setError("Invalid verification code. Please try again.");
+        setError(message);
       }
       // Immediately set verifying to false on error
       setIsVerifyingCode(false);
