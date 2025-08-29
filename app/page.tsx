@@ -8,6 +8,7 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise } from "phosphor-react";
+import { useHapticFeedback } from "../lib/utils";
 
 import SnapDrag from "./SnapDrag";
 
@@ -25,10 +26,10 @@ export default function Home() {
 }
 
 function Scoreboard() {
-  const currentUser = useQuery(api.auth.currentUser);
   const parentRefLeft = useRef<HTMLDivElement>(null);
   const parentRefRight = useRef<HTMLDivElement>(null);
   const { signOut } = useAuthActions();
+  const haptic = useHapticFeedback();
 
   // Fetch scoreboard derived on the server from the authenticated user
   const scoreboard = useQuery(api.scoreboard.getForCurrentUser, {});
@@ -120,6 +121,7 @@ function Scoreboard() {
   const handleIncrement = async (side: "left" | "right") => {
     if (isUpdating) return;
 
+    haptic.medium(); // Haptic feedback on increment
     setIsUpdating(true);
 
     // Optimistically update the UI immediately
@@ -149,6 +151,7 @@ function Scoreboard() {
     const currentValue = side === "left" ? left : right;
     if (currentValue <= 0) return;
 
+    haptic.light(); // Haptic feedback on decrement
     setIsUpdating(true);
 
     // Optimistically update the UI immediately
@@ -174,6 +177,7 @@ function Scoreboard() {
   const handleReset = async () => {
     if (isUpdating) return;
 
+    haptic.medium(); // Haptic feedback on reset confirm
     setIsUpdating(true);
 
     // Optimistically reset the UI immediately
@@ -193,6 +197,11 @@ function Scoreboard() {
       setIsUpdating(false);
       setShowResetConfirm(false);
     }
+  };
+
+  const handleResetClick = () => {
+    haptic.medium(); // Haptic feedback on reset button click
+    setShowResetConfirm(true);
   };
 
   return (
@@ -245,7 +254,7 @@ function Scoreboard() {
 
         {/* Reset button - bottom left */}
         <motion.button
-          onClick={() => setShowResetConfirm(true)}
+          onClick={handleResetClick}
           whileTap={{ scale: 0.9 }}
           className="absolute bottom-4 left-4 w-12 h-12 rounded-full bg-black/40 border border-neutral-500/40 text-white text-xs font-bold flex items-center justify-center shadow-lg"
         >
@@ -330,7 +339,10 @@ function Scoreboard() {
                   <div className="flex justify-end mb-4">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => signOut()}
+                      onClick={() => {
+                        haptic.light(); // Haptic feedback on sign out
+                        signOut();
+                      }}
                       className="text-sm px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors flex items-center gap-1 font-medium"
                     >
                       <svg
@@ -361,14 +373,20 @@ function Scoreboard() {
               <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6 space-y-2 space-y-reverse sm:space-y-0">
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowResetConfirm(false)}
+                  onClick={() => {
+                    haptic.light(); // Haptic feedback on cancel
+                    setShowResetConfirm(false);
+                  }}
                   className="inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 h-10 px-4 py-2"
                 >
                   Cancel
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleReset}
+                  onClick={() => {
+                    haptic.medium(); // Haptic feedback on reset button press
+                    handleReset();
+                  }}
                   className="text-white border border-red-500 dark:bg-red-600 dark:border-red-500 inline-flex items-center justify-center rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
                 >
                   Reset

@@ -12,9 +12,11 @@ import {
 } from "phosphor-react";
 import { PhoneInput } from "./PhoneInput";
 import { FaWhatsapp } from "react-icons/fa";
+import { useHapticFeedback } from "../lib/utils";
 // MARK: SignIn Component
 export function SignIn() {
   const { signIn } = useAuthActions();
+  const haptic = useHapticFeedback();
   const [step, setStep] = useState<
     "signIn" | { method: "email" | "whatsapp"; identifier: string }
   >("signIn");
@@ -27,6 +29,7 @@ export function SignIn() {
 
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    haptic.medium(); // Haptic feedback on button press
     setIsSendingCode(true);
     setError(null);
 
@@ -40,6 +43,7 @@ export function SignIn() {
         }
         await signIn("resend-otp", raw);
         setStep({ method, identifier: email });
+        haptic.success(); // Success haptic feedback when code is sent
       } else {
         if (!phoneNumber || !/^\+?[0-9]{8,15}$/.test(phoneNumber)) {
           throw new Error(
@@ -50,6 +54,7 @@ export function SignIn() {
         fd.append("email", phoneNumber);
         await signIn("whatsapp-otp", fd);
         setStep({ method, identifier: phoneNumber });
+        haptic.success(); // Success haptic feedback when code is sent
       }
     } catch (err) {
       const message =
@@ -67,6 +72,7 @@ export function SignIn() {
       } else {
         setError(message);
       }
+      haptic.error(); // Error haptic feedback on failure
     } finally {
       setIsSendingCode(false);
     }
@@ -74,6 +80,7 @@ export function SignIn() {
 
   const handleCodeSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    haptic.medium(); // Haptic feedback on button press
     setIsVerifyingCode(true);
     setError(null);
 
@@ -99,6 +106,7 @@ export function SignIn() {
         fd
       );
 
+      haptic.success(); // Success haptic feedback on successful verification
       // Only set timeout on successful verification
       setTimeout(() => {
         setIsVerifyingCode(false);
@@ -122,6 +130,7 @@ export function SignIn() {
       } else {
         setError(message);
       }
+      haptic.error(); // Error haptic feedback on verification failure
       // Immediately set verifying to false on error
       setIsVerifyingCode(false);
     }
@@ -208,6 +217,13 @@ function EmailForm({
   phoneNumber: string;
   setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const haptic = useHapticFeedback();
+
+  const handleMethodChange = (newMethod: "email" | "whatsapp") => {
+    haptic.light(); // Haptic feedback on method toggle
+    setMethod(newMethod);
+  };
+
   return (
     <motion.form
       initial={{ opacity: 0, x: -20 }}
@@ -219,7 +235,7 @@ function EmailForm({
       <div className="flex gap-2 border border-neutral-200 dark:border-neutral-800 p-1 rounded-xl text-sm">
         <button
           type="button"
-          onClick={() => setMethod("email")}
+          onClick={() => handleMethodChange("email")}
           className={`flex-1 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
             method === "email"
               ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
@@ -231,7 +247,7 @@ function EmailForm({
         </button>
         <button
           type="button"
-          onClick={() => setMethod("whatsapp")}
+          onClick={() => handleMethodChange("whatsapp")}
           className={`flex-1 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
             method === "whatsapp"
               ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
@@ -347,10 +363,12 @@ function CodeForm({
   resendConfirmation: boolean;
 }) {
   const { signIn } = useAuthActions();
+  const haptic = useHapticFeedback();
   const [isResending, setIsResending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleResendCode = async () => {
+    haptic.light(); // Haptic feedback on resend button press
     setIsResending(true);
     try {
       const formData = new FormData();
@@ -359,15 +377,22 @@ function CodeForm({
         method === "whatsapp" ? "whatsapp-otp" : "resend-otp",
         formData
       );
+      haptic.success(); // Success haptic feedback when resend succeeds
       setResendConfirmation(true);
       setTimeout(() => {
         setResendConfirmation(false);
       }, 3000);
     } catch (err) {
       console.error("Failed to resend code:", err);
+      haptic.error(); // Error haptic feedback when resend fails
     } finally {
       setIsResending(false);
     }
+  };
+
+  const handleBackClick = () => {
+    haptic.light(); // Haptic feedback on back button press
+    onBack();
   };
 
   return (
@@ -479,7 +504,7 @@ function CodeForm({
             {/* MARK: CodeForm Back Button */}
             <motion.button
               type="button"
-              onClick={onBack}
+              onClick={handleBackClick}
               disabled={isVerifying}
               whileTap={{ scale: 0.98 }}
               className="flex-1 bg-neutral-100 whitespace-nowrap hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 disabled:opacity-50 text-neutral-700 dark:text-neutral-300 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center border border-neutral-300 dark:border-neutral-700"
@@ -502,6 +527,7 @@ function OTPInput({
   onComplete: () => void;
 }) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const haptic = useHapticFeedback();
 
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) {
@@ -512,10 +538,12 @@ function OTPInput({
           inputRefs.current[i]!.value = code;
         }
       });
+      haptic.light(); // Haptic feedback on paste
       // Set focus to the last filled input or the next empty one
       const nextIndex = Math.min(codes.length, 3);
       inputRefs.current[nextIndex]?.focus();
     } else if (value.length === 1) {
+      haptic.light(); // Haptic feedback on digit entry
       // Move to next input
       if (index < 3) {
         inputRefs.current[index + 1]?.focus();
@@ -533,6 +561,7 @@ function OTPInput({
 
     // Auto submit when all digits are filled
     if (code.length === 4) {
+      haptic.medium(); // Stronger haptic feedback when complete
       onComplete();
     }
   };
