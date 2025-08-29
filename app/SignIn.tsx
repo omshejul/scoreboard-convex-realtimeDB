@@ -282,13 +282,13 @@ function EmailForm({
         type="submit"
         disabled={isLoading}
         whileTap={{ scale: 0.98 }}
-        className="w-full shadow-lg shadow-blue-500/20 hover bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+        className="w-full shadow-lg shadow-blue-500/20 hover bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-500 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
       >
         <div
           className={`w-full bg-gradient-to-t 
           ${
             isLoading
-              ? "from-blue-400 to-blue-400"
+              ? "from-blue-400 to-blue-500"
               : "from-blue-500 to-blue-600 group-hover:from-blue-500 group-hover:to-blue-700"
           }    text-white font-medium py-3 px-4 rounded-full transition-all disabled:cursor-not-allowed flex items-center justify-center text-shadow-lg`}
         >
@@ -419,13 +419,13 @@ function CodeForm({
             type="submit"
             disabled={isVerifying}
             whileTap={{ scale: 0.98 }}
-            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-400 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full shadow-lg shadow-blue-500/20 bg-gradient-to-b from-blue-500 to-blue-600 group hover:from-blue-500 hover:to-blue-700 disabled:from-blue-400 disabled:to-blue-500 text-white font-medium p-1.5 rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center"
           >
             <div
               className={`w-full bg-gradient-to-t 
           ${
             isVerifying
-              ? "from-blue-400 to-blue-400"
+              ? "from-blue-400 to-blue-500"
               : "from-blue-500 to-blue-600 group-hover:from-blue-500 group-hover:to-blue-700 "
           }   text-white font-medium py-3 px-4 rounded-full transition-all disabled:cursor-not-allowed flex items-center justify-center text-shadow-lg`}
             >
