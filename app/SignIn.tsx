@@ -199,11 +199,11 @@ function EmailForm({
       onSubmit={onSubmit}
       className="space-y-6"
     >
-      <div className="flex gap-2 border border-neutral-200 dark:border-neutral-800 p-1 rounded-full text-sm">
+      <div className="flex gap-2 border border-neutral-200 dark:border-neutral-800 p-1 rounded-xl text-sm">
         <button
           type="button"
           onClick={() => setMethod("email")}
-          className={`flex-1 py-2 rounded-full transition-colors flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
             method === "email"
               ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
               : "text-neutral-600 dark:text-neutral-400"
@@ -215,7 +215,7 @@ function EmailForm({
         <button
           type="button"
           onClick={() => setMethod("whatsapp")}
-          className={`flex-1 py-2 rounded-full transition-colors flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
             method === "whatsapp"
               ? "bg-neutral-900 dark:bg-neutral-900 text-white dark:text-white"
               : "text-neutral-600 dark:text-neutral-400"
@@ -250,12 +250,12 @@ function EmailForm({
               htmlFor="phone"
               className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
             >
-              WhatsApp number
+              Phone Number
             </label>
             <PhoneInput
               value={phoneNumber}
               onChange={setPhoneNumber}
-              placeholder="Phone number"
+              placeholder="77799 77799"
               disabled={isLoading}
               className="w-full"
             />
