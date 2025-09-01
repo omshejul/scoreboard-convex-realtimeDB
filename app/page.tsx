@@ -9,6 +9,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { SignIn } from "./SignIn";
 import { Minus, ArrowClockwise, Spinner } from "phosphor-react";
 import { useHapticFeedback } from "../lib/utils";
+import { useRouter } from "next/navigation";
 
 import SnapDrag from "./SnapDrag";
 
@@ -30,6 +31,8 @@ function Scoreboard() {
   const parentRefRight = useRef<HTMLDivElement>(null);
   const { signOut } = useAuthActions();
   const haptic = useHapticFeedback();
+
+  const router = useRouter();
 
   // Fetch scoreboard derived on the server from the authenticated user
   const scoreboard = useQuery(api.scoreboard.getForCurrentUser, {});
@@ -210,7 +213,18 @@ function Scoreboard() {
     haptic.light();
     setIsSigningOut(true);
     try {
+      // Clear any client-side persisted UI state before auth state changes
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem("left-decrement-btn-corner");
+          window.localStorage.removeItem("right-decrement-btn-corner");
+        } catch {}
+      }
+      // Close modal immediately for better perceived speed
+      setShowResetConfirm(false);
       await signOut();
+      // Force re-render to flip Authenticated/Unauthenticated immediately
+      router.refresh();
     } catch (error) {
       console.error("Failed to sign out:", error);
       setIsSigningOut(false);
