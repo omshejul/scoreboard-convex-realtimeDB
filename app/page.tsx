@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { SignIn } from "./SignIn";
-import { Minus, ArrowClockwise } from "phosphor-react";
+import { Minus, ArrowClockwise, Spinner } from "phosphor-react";
 import { useHapticFeedback } from "../lib/utils";
 
 import SnapDrag from "./SnapDrag";
@@ -90,6 +90,7 @@ function Scoreboard() {
   const [optimisticRight, setOptimisticRight] = useState<number | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   console.log("[SCOREBOARD]", scoreboard);
 
@@ -202,6 +203,18 @@ function Scoreboard() {
   const handleResetClick = () => {
     haptic.medium(); // Haptic feedback on reset button click
     setShowResetConfirm(true);
+  };
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    haptic.light();
+    setIsSigningOut(true);
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -339,28 +352,35 @@ function Scoreboard() {
                   <div className="flex justify-end mb-4">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        haptic.light(); // Haptic feedback on sign out
-                        signOut();
-                      }}
-                      className="text-sm px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors flex items-center gap-1 font-medium"
+                      onClick={handleSignOut}
+                      disabled={isSigningOut}
+                      className="text-sm px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Sign out
+                      {isSigningOut ? (
+                        <>
+                          <Spinner size={14} className="animate-spin" />
+                          Signing out…
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          Sign out
+                        </>
+                      )}
                     </motion.button>
                   </div>
                 </div>
