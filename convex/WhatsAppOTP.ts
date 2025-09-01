@@ -3,7 +3,7 @@ import { RandomReader, generateRandomString } from "@oslojs/crypto/random";
 
 export const WhatsAppOTP = Email({
   id: "whatsapp-otp",
-  maxAge: 60 * 15,
+  maxAge: 60 * 15, // 15 minutes
   async generateVerificationToken() {
     const random: RandomReader = {
       read(bytes) {
